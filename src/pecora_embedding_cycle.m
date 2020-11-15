@@ -257,24 +257,15 @@ for ts = 1:size(x,2)
     % preallocate storing vector for minimum epsilon from the
     % continuity statistic
     epsilon_star = zeros(tN,NNN);
-    
-    if undersamp
-        % for the undersampling statistic perform convolution of the time
-        % series
-        [xx,sigma] = convolute(x(:,ts),x(:,ts));
-        
-        % preallocate storing vector for maximum gamma from the
-        % undersampling statisctic
-        gamma_k = zeros(tN,NNN);
-        
-        dist = NaN*ones(tN,NNN);
-    end
-    
+
     % loop over all fiducial points, look at their neighbourhoods and
     % compute the continuity as well as the undersampling statistic for
     % each of them. Eventually we average over all the values to get
     % the continuity and undersampling statistic for the actual tau
     % value.
+    
+    NN_idxs = zeros(NNN,neighbours);
+    
     for k = 1:NNN
 
         % bind the fiducial point from the trajectory sample
@@ -289,6 +280,7 @@ for ts = 1:size(x,2)
         % sort these distances in ascending order
         [~,ind] = sort(distances);
         
+
         % 1) compute the continuity statistic
 
         % loop over all delta-neighbourhoods. Here we take the table
@@ -326,101 +318,60 @@ for ts = 1:size(x,2)
             % incorporate onther loop over all the input time series, when
             % allowing multivariate input. 
             Y_new = embed2(Y_old,x(:,ts),tau);
-                      
-            % loop over all neighbours (determined by the delta-
-            % neighbourhood-size) and get their distances to the
-            % fiducial point. 
-            
-            l = 2;  % start with the first neighbour which is not 
-                    % the fiducial point itself
-            for nei = 1:neighbours
-                            
-                % this while loop gurantees, that we look at a true
-                % neighbour and not a one which lies in the
-                % correlation window of the fiducial point
-                while true
-
-                    % save the last component of this 
-                    % neighbour for later comparison to the epsilon
-                    % interval. Therefore, first check that the 
-                    % neighbour is not in the temporal correlation 
-                    % window (determined by the input 'theiler').
-                    % If it is, go on to the next.
-                    if ind(l) > fiducial_point + theiler || ...
-                            ind(l) < fiducial_point - theiler
-                        % save the distance of the valid neighbour 
-                        eps_distances(tau_counter,nei) = ...
-                            abs(Y_new(ind(l),size(Y_new,2))...
-                            -Y_new(fiducial_point,size(Y_new,2)));
-                        if nei == 1
-                            dist_old(ts,k)=distances(ind(l));
-                        end
-                        break
-                    else
-                        % check the next neighbour
-                        l = l + 1;
-                    end
-                    % make sure the data set is sufficiently
-                    % sampled, if not pass an error. Since 'ind' is
-                    % a vector storing all indices of nearest
-                    % neighbours and l is exceeding its length
-                    % would mean that all neighbours are so close
-                    % in time that they fall within the correlation
-                    % window OR the number of neighbours one is
-                    % looking at (see table 1 in the paper) is too
-                    % large
-                    if l > length(ind)
-                        error('not enough neighbours')
-                    end
-                end 
-                
-                % 2) compute undersampling statistic
-                if nei == 1 && undersamp
-                    % undersampling statistic
-
-                    % compute new neighbourhood
-                    [distances2,comp_dist_new] = ...
-                        all_distances(Y_new(fiducial_point,:),Y_new,norm);
-
-                    [~,ind2] = sort(distances2);
-
-                    % search for valid neighbour w.r.t. theiler window
-                    for i = 1:length(ind2)
-                        if ind2(i) > fiducial_point + theiler || ...
-                            ind2(i) < fiducial_point - theiler
-                            
-                            % bind the distance
-                            dist(tau_counter,k) = distances2(ind2(i));                            
-                            break
-                        else
-                            continue
-                        end
-                    end
-
-                    if isnan(dist(tau_counter,k))
-                        error('no valid neighbours, please reduce the theiler wondow or increase data size')
-                    end
-
-                    % perform undersampling statistic test. You'll find the 
-                    % helper function undersampling at the end of this script.
-                  
-                    % now run the undersampling statistic function on the
-                    % already computed convolution sigma and for the
-                    % distances stored in dist under the significance level
-                    % alpha
-                    if length(taus) == 1
-                        gg = undersampling(xx,sigma,comp_dist_new(ind2(i),end-1:end),beta);
-                        gamma_k(tau_counter,k) = max(gg);
-                    else
-                        gamma_k(tau_counter,k) = undersampling(xx,sigma,comp_dist_new(ind2(i),end),beta);
-                    end
-                end
-                
-                % check the next neighbour
-                l = l + 1;
                    
-            end 
+            if taus == 1
                 
+                % loop over all neighbours (determined by the delta-
+                % neighbourhood-size) and get their distances to the
+                % fiducial point. 
+
+                l = 2;  % start with the first neighbour which is not 
+                        % the fiducial point itself
+                for nei = 1:neighbours
+
+                    % this while loop gurantees, that we look at a true
+                    % neighbour and not a one which lies in the
+                    % correlation window of the fiducial point
+                    while true
+
+                        % save the last component of this 
+                        % neighbour for later comparison to the epsilon
+                        % interval. Therefore, first check that the 
+                        % neighbour is not in the temporal correlation 
+                        % window (determined by the input 'theiler').
+                        % If it is, go on to the next.
+                        if ind(l) > fiducial_point + theiler || ...
+                                ind(l) < fiducial_point - theiler
+                             NN_idxs(k,nei) = ind(l);
+                             l = l + 1;
+                             break
+                        else
+                            % check the next neighbour
+                            l = l + 1;
+                        end
+                        % make sure the data set is sufficiently
+                        % sampled, if not pass an error. Since 'ind' is
+                        % a vector storing all indices of nearest
+                        % neighbours and l is exceeding its length
+                        % would mean that all neighbours are so close
+                        % in time that they fall within the correlation
+                        % window OR the number of neighbours one is
+                        % looking at (see table 1 in the paper) is too
+                        % large
+                        if l > length(ind)
+                            error('not enough neighbours')
+                        end
+                    end 
+
+                end
+
+            end 
+            
+            % save the distance of the valid neighbour 
+            eps_distances(tau_counter,:) = ...
+                abs(Y_new(NN_idxs(k,:),size(Y_new,2))...
+                -Y_new(fiducial_point,size(Y_new,2)));
+
             % increase counter for tau-loop
             tau_counter = tau_counter + 1;  
             
@@ -453,13 +404,7 @@ for ts = 1:size(x,2)
         epsilon_star(:,k) = min(epsilon_star_delta,[],2); 
                                   
     end
-    
-    if ~undersamp
-        dist_{ts} = NaN;
-    else
-        dist_{ts} = dist;
-    end
-    
+
     clear dist
     
     % average over the fiducial points
@@ -470,14 +415,6 @@ for ts = 1:size(x,2)
     % this dimension-iteration
     epsilon_mins(:,ts) = epsilon_min_avrg;
     
-    % 2) gamma statistic
-    if undersamp
-        
-        gamma_avrg = mean(gamma_k,2);
-        % save all gamma vals corresponding to the different tau-vals for
-        % this dimension-iteration
-        gammas(:,ts) = gamma_avrg;
-    end
        
 end
         

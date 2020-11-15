@@ -6,8 +6,8 @@ function [Y_tot,tau_vals,ts_vals,epsilons,LS] = pecuzal_embedding(x,varargin)
 % Minimum input-arguments: 1
 % Maximum input-arguments: 21
 %
-% [Y, tau_vals, ts_vals, epsilon_mins, peaks, Ls] = 
-%                       pecora_uzal_embedding(x, tau_vals [,Name, Value]);
+% [Y, tau_vals, ts_vals, epsilon_mins, Ls] = 
+%                       pecuzal_embedding(x, tau_vals [,Name, Value]);
 %
 % This function embeds the input time series `x` with different delay
 % times tau. `x` can be a multivariate dataset, i.e. many univariate time 
@@ -37,14 +37,14 @@ function [Y_tot,tau_vals,ts_vals,epsilons,LS] = pecuzal_embedding(x,varargin)
 %                   order to compute the continuity statistic. This is a
 %                   float from the intervall (0 1]. The size of the 
 %                   considered sample is `datasample`*length of the current
-%                   phase space trajectory (Default is 0.1, i.e. half of 
+%                   phase space trajectory (Default is 1, i.e. all 
 %                   the trajectory points will be considered).
-% `theiler_window`  Defines a temporal correlation window for which no
+% `theiler`         Defines a temporal correlation window for which no
 %                   nearest neighbours are considered to be true, since
 %                   they could be direct predecessors or successors of the
 %                   fiducial point (Default is 1). When input `x` is a
-%                   multivariate dataset, `theiler_window` needs to be
-%                   chosen as the maximum `theiler window` from each of the
+%                   multivariate dataset, `theiler` needs to be
+%                   chosen as the maximum `theiler` from each of the
 %                   time series.
 % `alpha`           The significance level for the continuity statistic
 %                   (Default is `alpha=0.05`)
@@ -59,7 +59,7 @@ function [Y_tot,tau_vals,ts_vals,epsilons,LS] = pecuzal_embedding(x,varargin)
 % `k`               The considered number of nearest neighbors for Uzal's
 %                   L-statistic (Default is `k=3`).
 % `Tw`              The considered maximum time horizon used for obtaining
-%                   Uzal's L-statistic (Default is `Tw=4*theiler_window`).
+%                   Uzal's L-statistic (Default is `Tw = 4*theiler`).
 % `norm`            The norm used for the distance calculations. Either
 %                   `euc` (Default) or `max`.
 % `max_cycles`      The maximum number of embedding cycles the algorithm
@@ -95,7 +95,7 @@ function [Y_tot,tau_vals,ts_vals,epsilons,LS] = pecuzal_embedding(x,varargin)
 
 % define default values
 delay_vals = 0:50;
-sample_size = 0.1;
+sample_size = 1.0;
 theiler = 1;
 alpha = 0.05;
 p_val = 0.5;
@@ -220,7 +220,7 @@ while flag
             % loop over the statistics for each time series
             for ts = 1:xN
                 % extract the corresponding continuity statistic
-                epsilon_min_avrg = epsilons_{trial};
+                epsilon_min_avrg = epsilons_{trial};         
                 epsilon_min_avrg = epsilon_min_avrg(:,ts);
                 % add 0 to account for lag 0 being also a peak
                 epsilon_min_avrg = [0; epsilon_min_avrg]; 
@@ -252,7 +252,7 @@ while flag
                         end
                         clear Y_new
                     end
-
+                    
                     % pick the peak, which goes along with the least L/cost
                     if xN>1
                         [~, order] = sort(cost_);
