@@ -1,13 +1,18 @@
 function Y2 = embed2(varargin)
-% embed2 takes a matrix 'Y' containing all phase space vectors, a univariate
+% EMBED2 takes a matrix 'Y' containing all phase space vectors, a univariate
 % time series 'x' and a tau value 'tau' as input. embed2 then expands the 
 % input phase space vectors by an additional component consisting of the 
 % tau-shifted values of the input time series x.
 % 
-% Y2 = embed2(Y,x,tau)
+%               Y2 = embed2(Y,x,tau)
 % 
-% K.H.Kraemer, Mar 2020
-
+% Copyright (c) 2020
+% K. Hauke Kraemer, 
+% Potsdam Institute for Climate Impact Research, Germany
+% http://www.pik-potsdam.de
+%
+% This program is free software and runs under MIT licence.
+%%
 Y = varargin{1};
 x = varargin{2};
 tau = varargin{3};
