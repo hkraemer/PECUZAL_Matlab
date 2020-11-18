@@ -1,7 +1,8 @@
-# safelist
+# blocklist
 branches:
-  only:
-  - main
+  except:
+  - Git_docs
+
 
 language: matlab
 matlab:
