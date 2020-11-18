@@ -5,6 +5,6 @@ branches:
 
 language: matlab
 matlab:
-    - R2017a
+    - R2018a
 
 script: cd ./tests/; matlab -batch 'test_pecuzal'
