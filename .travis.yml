@@ -1,7 +1,5 @@
 language: matlab
 matlab:
-    - latest
-    - R2016a
-    - R2020a
+    - R2017a
 
 script: cd ./tests/; matlab -batch 'test_pecuzal'
