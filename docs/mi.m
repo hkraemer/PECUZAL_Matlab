@@ -123,13 +123,6 @@ init_properties
 narginchk(1,99)
 nargoutchk(0,2)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% splash the GPL
-
-splash_gpl('crp');
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% error control
-%try 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% read the input
 
 set(0,'ShowHidden','on')
@@ -648,90 +641,3 @@ set(0,'ShowHidden','off')
 try set(0,props.root), end
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% error handling
-if 0
-%catch
-  if ~isempty(findobj('Tag','TMWWaitbar')), delete(findobj('Tag','TMWWaitbar')), end
-  cmd={'mean';'var';'std';'median';'squmean';'geomean';'bias';'skewness';'kurtosis'};
-  z_whos=whos;x_lasterr=lasterr;y_lastwarn=lastwarn;if nargin;in=varargin{1};else in.class='no input given';end
-  if ischar(in), in2=in; else in2=[]; end
-  in=whos('in');
-  if ~strcmpi(lasterr,'Interrupt')
-    fid=fopen('error.log','w');
-    fprintf(fid,'%s\n','Please send us the following error report. Provide a brief');
-    fprintf(fid,'%s\n','description of what you were doing when this problem occurred.');
-    fprintf(fid,'%s\n','E-mail or FAX this information to us at:');
-    fprintf(fid,'%s\n','    E-mail:  marwan@pik-potsdam.de');
-    fprintf(fid,'%s\n','       Fax:  ++49 +331 288 2508');
-    fprintf(fid,'%s\n\n\n','Thank you for your assistance.');
-    fprintf(fid,'%s\n',repmat('-',50,1));
-    fprintf(fid,'%s\n',datestr(now,0));
-    fprintf(fid,'%s\n',['Matlab ',char(version),' on ',computer]);
-    fprintf(fid,'%s\n',repmat('-',50,1));
-    fprintf(fid,'%s\n',x_lasterr);
-    fprintf(fid,'%s\n',y_lastwarn);
-    fprintf(fid,'%s\n',[' during ==> mi:',action]);
-    fprintf(fid,'%s',[' input ==> ',in.class]);
-    if ~isempty(in2), fprintf(fid,'\t%s\n',[' (',in2,')']); end
-    fprintf(fid,'%s\n',' errorcode ==> no errorcode available');
-    fprintf(fid,'%s\n',' workspace dump ==>');
-    if ~isempty(z_whos), 
-        fprintf(fid,'%s\n',['Name',char(9),'Size',char(9),'Bytes',char(9),'Class']);
-        for j=1:length(z_whos);
-            fprintf(fid,'%s',[z_whos(j).name,char(9),num2str(z_whos(j).size),char(9),num2str(z_whos(j).bytes),char(9),z_whos(j).class]);
-            if ~strcmp(z_whos(j).class,'cell') && ~strcmp(z_whos(j).class,'struct')
-                  content=eval(z_whos(j).name);
-	          content=mat2str(content(1:min([size(content,1),500]),1:min([size(content,2),500])));
-                  fprintf(fid,'\t%s',content(1:min([length(content),500])));
-            elseif strcmp(z_whos(j).class,'cell')
-                  content=eval(z_whos(j).name);
-                  fprintf(fid,'\t');
-                  for j2=1:min([length(content),500])
-                    fprintf(fid,'{%s} ',content{j2});
-                  end
-            elseif strcmp(z_whos(j).class,'struct')
-                  content=fieldnames(eval(z_whos(j).name));
-                  content=char(content); content(:,end+1)=' '; content=content';
-                  fprintf(fid,'\t%s',content(:)');
-            end
-            fprintf(fid,'\n');
-        end
-    end
-    fclose(fid);
-    disp('----------------------------');
-    disp('       ERROR OCCURED');
-    disp('    during executing mi');
-    disp('----------------------------');
-    disp(x_lasterr);
-    disp(['   during ',action]);
-    disp('----------------------------');
-    disp('   Please send us the error report. For your convenience, ')
-    disp('   this information has been recorded in: ')
-    disp(['   ',fullfile(pwd,'error.log')]), disp(' ')
-    disp('   Provide a brief description of what you were doing when ')
-    disp('   this problem occurred.'), disp(' ')
-    disp('   E-mail or FAX this information to us at:')
-    disp('       E-mail:  marwan@pik-potsdam.de')
-    disp('          Fax:  ++49 +331 288 2508'), disp(' ')
-    disp('   Thank you for your assistance.')
-    warning('on')
-  end
-  try 
-      if ~nogui
-          setptr(h_fig(1),'arrow')
-          h=findobj('tag','button_apply');
-          set(h(1),'ToolTip','Starts the computation.','String','Apply','Callback','mi compute')
-          for j=1:length(obj); 
-              h=findobj('Tag',obj{j},'Parent',h_fig(1)); 
-              if ~isempty(h)
-                set(h,'Enable','On')
-              end
-          end
-      end
-  catch
-  end
-  if nargout, varargout={NaN}; end
-  try set(0,props.root),catch end
-  set(0,'ShowHidden','off')
-end
