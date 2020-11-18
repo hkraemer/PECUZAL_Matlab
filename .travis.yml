@@ -1,7 +1,7 @@
 # safelist
 branches:
   only:
-  - master
+  - main
 
 language: matlab
 matlab:
