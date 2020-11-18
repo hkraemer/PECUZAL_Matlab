@@ -48,6 +48,7 @@ README.rst
     <param.matlabpath.excludes>
       <item>/Applications/MATLAB_R2020a.app/toolbox/matlab/demos</item>
       <item>/Users/hkraemer/Documents/MATLAB</item>
+      <item>/tests</item>
     </param.matlabpath.excludes>
     <param.javaclasspath.excludes />
     <param.exported.on.package>false</param.exported.on.package>
@@ -105,16 +106,12 @@ README.rst
       <file>${PROJECT_ROOT}/LICENCE</file>
       <file>${PROJECT_ROOT}/src</file>
     </fileset.rootfiles>
-    <fileset.depfun.included>
+    <fileset.depfun.included />
+    <fileset.depfun.excluded>
       <file>${MATLAB_ROOT}/toolbox/matlab/demos/logo.mat</file>
-      <file>/Users/hkraemer/Documents/MATLAB/CRPtool/gpl.m</file>
       <file>/Users/hkraemer/Documents/MATLAB/CRPtool/hist2.m</file>
-      <file>/Users/hkraemer/Documents/MATLAB/CRPtool/mi.m</file>
-      <file>/Users/hkraemer/Documents/MATLAB/CRPtool/private/init_properties.m</file>
-      <file>/Users/hkraemer/Documents/MATLAB/CRPtool/private/splash_gpl.m</file>
       <file>/Users/hkraemer/Documents/MATLAB/error.log</file>
-    </fileset.depfun.included>
-    <fileset.depfun.excluded />
+    </fileset.depfun.excluded>
     <fileset.package />
     <build-deliverables>
       <file location="${PROJECT_ROOT}" name="pecuzal-embedding.mltbx" optional="false">/Users/hkraemer/Documents/Git/pecuzal-matlab/PECUZAL_Matlab/pecuzal-embedding.mltbx</file>

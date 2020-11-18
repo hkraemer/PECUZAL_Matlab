@@ -3,9 +3,9 @@ branches:
   except:
   - Git_docs
 
-
 language: matlab
 matlab:
+    - latest
     - R2018a
 
 script: cd ./tests/; matlab -batch 'test_pecuzal'
