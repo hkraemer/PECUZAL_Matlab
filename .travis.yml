@@ -6,6 +6,6 @@ branches:
 language: matlab
 matlab:
     - latest
-    - R2019a
+    - R2020a
 
 script: cd ./tests/; matlab -batch 'test_pecuzal'

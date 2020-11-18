@@ -176,7 +176,9 @@ epsilons = cell(1,max_num_of_cycles);
 
 % loop over increasing embedding dimensions until some break criterion will
 % tell the loop to stop/break
-while flag  
+bar = waitbar(0,'PECUZAL embeds your time series');
+while flag
+    waitbar(cnt/max_num_of_cycles,bar,strcat('PECUZAL embeds your time series \newline Executing embedding cycle no.:',num2str(cnt),' out of a maximum of ',num2str(max_num_of_cycles)))
     % in the first run we need to find the time series to start with, i.e.
     % we have to encounter xN^2 continuity statistics...
     if cnt == 1
@@ -364,6 +366,7 @@ while flag
     % increase dimension index counter  
     cnt = cnt + 1;   
 end
+close(bar)
 % final reconstruction
 for m = 1:length(tau_vals)
     if m == 1
