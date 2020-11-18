@@ -3,4 +3,4 @@ matlab:
     - latest
     - R2020a
 
-script: matlab -batch './tests/test_pecuzal'
+script: cd ./tests/; matlab -batch 'test_pecuzal'
