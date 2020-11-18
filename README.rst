@@ -1,3 +1,9 @@
+.. image:: https://travis-ci.org/hkraemer/PECUZAL_Matlab.svg?branch=main
+    :target: https://travis-ci.org/hkraemer/PECUZAL_Matlab
+
+.. image:: https://img.shields.io/badge/docs-dev-blue.svg
+    :target: https://hkraemer.github.io/PECUZAL_Matlab/
+
 
 PECUZAL Matlab
 ==============

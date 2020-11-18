@@ -1,6 +1,6 @@
 %% Test PECUZAL functionality
 
-clear
+% clear
 
 assert(4==4)
 % % Test case for univariate example
