@@ -1,11 +1,11 @@
 function L = uzal_cost(varargin)
 % UZAL_COST Calculates the values of L-statistics.
-%    L = UZAL_COST(Y) computes vector L containing the values of the cost 
+%    L = UZAL_COST(X) computes vector L containing the values of the cost 
 %    function proposed in Uzal et al., Phys. Rev. E 84, 016223, 2011 of a 
-%    given phase space trajectory provided by (NxM) matrix Y, with N the length
+%    given phase space trajectory provided by (N-by-M) matrix X, with N the length
 %    of phase space trajectory and M the dimension.
 %
-%    L = UZAL_COST(Y, THEILER, K, TW, SAMPLE_SIZE, NORM) calculates L using
+%    L = UZAL_COST(X, THEILER, K, TW, SAMPLE_SIZE, NORM) calculates L using
 %    Theiler window THEILER (default 1), for excluding serial correlated points,
 %    the number K of nearest neighbors to be considered (default 3), the time
 %    forward parameter TW (default 40), the fraction SAMPLE_SIZE of input time 

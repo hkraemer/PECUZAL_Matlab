@@ -1,75 +1,33 @@
-function [epsilon_mins,gammas,dist_old,dist_,Y_old,fiducials] = pecora_embedding_cycle(varargin)
+function [epsilon_mins, gammas, dist_old, dist_, Y_old, fiducials] = pecora_embedding_cycle(varargin)
 % PECORA_EMBEDDING_CYCLE calculates the continuity statistics.
-%    PECORA_EMBEDDING_CYCLE computes the continuity statistic `epsilon_mins`
-% based on the paper of Pecora et al., Chaos 17 (2007).
+%    EPSILON_MINS = PECORA_EMBEDDING_CYCLE(X, TAU) computes vector EPSILON_MINS
+%    containing the values of the continuity statistic based on Pecora et al., 
+%    Chaos 17 (2007) for a given one- or multivariate time series provided by (N-by-M) 
+%    matrix X, with N the length of the time series and M the number of time series, 
+%    and for time delays given in vector TAU. In the first run, simply set TAU=0 to 
+%    start with a non-embedded time series.
 %
-% Minimum input-arguments: 2
-% Maximum input-arguments: 12
+%    ... = PECORA_EMBEDDING_CYCLE(X, TAU, JS) computes the continuity statistic
+%    using the time series from X identified by vector JS, which is a number from 1 to M
+%    and according to the given delay in TAU.
 %
-% [epsilon_mins, gammas, dist_old, dist, Y_old, fiducials] = 
-%                       pecora_embedding_cycle(x,taus,js,delay_vals,...
-%                                       sample_size,theiler,alpha,p,...
-%                                       KNN,norm);
+%    ... = PECORA_EMBEDDING_CYCLE(X, TAU, JS, DELAY, SAMPLE_SIZE, THEILER, ALPHA, P, KNN, NORM)
+%    computes the continuity statistic for possible delay times given by vector DELAY 
+%    (default [0:50]), the fraction SAMPLE_SIZE of input time series length defining the 
+%    size of the random phase space vector sample (default 0.1), the Theiler window THEILER 
+%    (default 1), the significance level ALPHA (default 0.05) and binomial parameter P
+%    (default 0.5) for the continuity statistic, the maximal number of points KNN in the 
+%    delta-neighbourhood (default 8) which has to be at least 8, and the norm used for distance 
+%    computations, which can be 'max' for Chebychev norm or 'euc' for Euclidean norm (default). 
 %
-% Input:    
-%
-% `x`               A uni- or multivariate time series, which needs to be
-%                   embedded. If the input data is a multivariate set, the
-%                   algorithm scans all time series and constructs the
-%                   according statistics.
-% `taus`            An array, which stores the taus for embedding the time
-%                   series in `x`. In the first run, simply set `taus=[0]`,
-%                   to start with a non-embedded time series.
-% `js`              An array, which stores the time series numbers as given
-%                   in 'x' according to the given 'taus'.
-% `delay_vals`      A vector defining for which possible delay times tau the
-%                   algorithm shall look (Default is `delay_vals` = 0:50).
-% `sample_size`     Defines the size of the random phase space vector 
-%                   sample the algorithm considers for each tau value, in 
-%                   order to compute the continuity statistic. This is a
-%                   float from the interval (0 1]. The size of the 
-%                   considered sample is `sample_size`*length of the current
-%                   phase space trajectory (Default is 0.1, i.e. 1/10 of 
-%                   the trajectory points will be considered).
-% `theiler`         Defines a temporal correlation window for which no
-%                   nearest neighbours are considered to be true, since
-%                   they could be direct predecessors or successors of the
-%                   fiducial point (Default is 1). When input `x` is a
-%                   multivariate dataset, `theiler` needs to be chosen as 
-%                   the maximum theiler window from each of the time series..
-% `alpha`           The significance level for the continuity statistic.
-% `p`               The binomial parameter used for obtaining the continuity 
-%                   statistic (Default is `p=.5`).
-% `KNN`             The maximal number of points in the delta-neighbourhood. 
-%                   For a range of points from `8:KNN` the minimial 
-%                   epsilon-scale according to the significance level `alpha` 
-%                   and binomial parameter `p` gets computed and the minimum 
-%                   of all considered delta-neighborhood-sizes is finally 
-%                   taken. Must be at least 8 (Default is `KNN=8`)
-% `norm`            norm for distance calculations. 'euc' (Default) or 'max' 
-%
-% Output: 
-%
-% `epsilon_mins`    Continuity statistic. A matrix storing all epsilon-
-%                   mins as a function of `delay_vals` for each encountered 
-%                   time series in input `x`.
-% `gammas`          Undersampling statistic. If `undersampling` input is 
-%                   'true' this statistic will be returned. A matrix 
-%                   storing all gamma values as a function of `delay_vals` 
-%                   for each encountered time series in input `x`.
-% `dist_old`        All nearest neighbour distances to each fiducial point
-%                   for the given trajectory. This is a number of fiducial 
-%                   points - dimensional array, for each encountered time
-%                   series.
-% `dist`            All nearest neighbour distances to each fiducial point
-%                   for each value of considered tau. This is a 
-%                   `length(delay_vals)`*number of fiducial points - 
-%                   dimensional array for each encountered time series. 
-%                   Each of them is stored as entry in a cell array.
-% `Y_old`           The phase space trajectory for which the additional
-%                   tau's are being tested
-% `fiducials`       The indices of the chosen fiducial points
-
+%    [EPSILON_MINS, GAMMA, DIST_OLD, DIST, Y_OLD, FIDUCIALS] = PECORA_EMBEDDING_CYCLE(...)
+%    provides the M-by-K matrix GAMMA with the undersampling statistic as a function of the delays
+%    given by the K-sized vector DELAY and the M time series X, the matrix of nearest neighbour  
+%    distances DIST_OLD for each fiducial point for the given trajectory, the cell array DIST
+%    with all nearest neighbour distances to each fiducial point for each value of considered tau
+%    (M matrices of size (number of fiducial points)-by-K), the matrix of the phase space 
+%    trajectory Y_OLD for which the additional tau's are being tested, and the vector FIDUCIALS
+%    of the indices of the chosen fiducial points (defined by the random sample).
 
 % Copyright (c) 2020
 % K. Hauke Kraemer, 
@@ -88,18 +46,18 @@ nargoutchk(1,6)
 
 x = varargin{1};
 % make the input time series a column vector
-if size(x,1)<size(x,2)
+if size(x,1) < size(x,2)
     x = x';
 end
 % normalize time series
-x = (x-mean(x))./std(x);
+x = (x-mean(x)) ./ std(x);
 
 taus = varargin{2};
 
 try
     js = varargin{3};
 catch
-    js = ones(1,length(taus));
+    js = ones(1, length(taus));
 end
 
 if length(taus) ~= length(js)
@@ -156,12 +114,11 @@ catch
     deltas = 8;
 end
 
-methLib={'euc','max'}; % the possible norms
+methLib = {'euc', 'max'}; % the possible norms
 try
     norm = varargin{10};
     if ~isa(norm,'char') || ~ismember(norm,methLib)
-       warning(['Specified norm should be one of the following possible values:',...
-           10,sprintf('''%s'' ',methLib{:})])
+       warning(sprintf('Specified norm should be one of the following possible values: ''%s'', ''%s''.', methLib{:}))
        norm = 'euc';
     end
 catch
@@ -173,7 +130,7 @@ end
 % Concerning the delta neighborhood of the continuity statistic:
 
 % table for the continuity statistic
-bino_table = get_binomial_table(p_val,alpha,deltas);
+bino_table = get_binomial_table(p_val, alpha, deltas);
 delta_points = bino_table(:,1);
 epsilon_points = bino_table(:,2);
 
@@ -183,20 +140,21 @@ neighbours = delta_points(end);
 % intial phase space vector
 for m = 1:length(taus)
     if m == 1
-        Y_old = embed(x(:,js(m)),m,taus(m));
+        Y_old = embed(x(:,js(m)), m, taus(m));
     else
-        Y_old = embed2(Y_old,x(:,js(m)),taus(m));
+        Y_old = embed2(Y_old, x(:,js(m)), taus(m));
     end
 end
 YN = length(Y_old);
+
 % length of the reference point trajectory
-NNN = floor(sample_size*(YN-delay_vals(end)));
+NNN = floor(sample_size * (YN-delay_vals(end)));
 
 % preallocate output
-epsilon_mins = zeros(tN,size(x,2));
-gammas = zeros(tN,size(x,2));
-dist_ = cell(1,size(x,2));
-dist_old = NaN*ones(size(x,2),NNN);
+epsilon_mins = zeros(tN, size(x,2));
+gammas = zeros(tN, size(x,2));
+dist_ = cell(1, size(x,2));
+dist_old = NaN * ones(size(x,2), NNN);
 
 % select a random phase space vector sample.
 if sample_size == 1
@@ -208,13 +166,11 @@ end
 fiducials = data_samps;
 
 % loop over the different time series
-for ts = 1:size(x,2)
-    
+h = waitbar(0,'pecora');
+for ts = 1:size(x, 2)
+waitbar(ts/size(x, 2));
     % preallocate storing vector for continuity statistic
-    epsilon_star = zeros(tN,NNN);
-
-    % preallocate nearest neighbour indices matrix
-    NN_idxs = zeros(NNN,neighbours);
+    epsilon_star = zeros(tN, NNN);
     
     % loop over all fiducial points
     for k = 1:NNN
@@ -223,73 +179,47 @@ for ts = 1:size(x,2)
         
         % compute distances to all other points in dimension d.
         [distances, ~] = all_distances(Y_old(fiducial_point,:),...
-                                      Y_old(1:end-delay_vals(end),:),norm);                                      
+                                      Y_old(1:end-delay_vals(end),:), norm);
         % sort these distances in ascending order
         [~,ind] = sort(distances);
         
-        % set index-counter for the upcoming for-loop over the different tau 
-        % values
-        tau_counter = 1;
-        
+        % temporal neighbours within Theiler window
+        idx = max(1, fiducial_point - theiler):min(NNN, fiducial_point + theiler);
+        % remove these neighbours from index list for distances
+        ind(ismember(ind, idx)) = [];
+        % construct neighbourhood
+        NN_idxs = ind(1:neighbours)'; % indices of the valid neighbours 
+
         % preallocate storing vector for distances of epsilon neighborhood
-        eps_distances = zeros(tN,neighbours);
+        eps_distances = zeros(tN, neighbours);
         
         % loop over the different tau values
         for taus = 1:tN    
             tau = delay_vals(taus);
             % create new phase space vector.
-            Y_new = embed2(Y_old,x(:,ts),tau);          
-            if taus == 1
-                % loop over all neighbours (determined by the delta-
-                % neighbourhood-size) and get their distances to the
-                % fiducial point. 
-                l = 2;  % start with the first neighbour which is not 
-                        % the fiducial point itself
-                for nei = 1:neighbours
-                    % this while loop gurantees, that we look at a true
-                    % neighbour and not a one which lies in the
-                    % correlation window of the fiducial point
-                    while true
-                        if ind(l) > fiducial_point + theiler || ...
-                                ind(l) < fiducial_point - theiler
-                             NN_idxs(k,nei) = ind(l);
-                             l = l + 1;
-                             break
-                        else
-                            % check the next neighbour
-                            l = l + 1;
-                        end
-                        % make sure the data set is sufficiently
-                        % sampled
-                        if l > length(ind)
-                            error('not enough neighbours')
-                        end
-                    end 
-                end
-            end 
+            %Y_new = embed2(Y_old, x(:,ts), tau);          
             
             % save the distance of the valid neighbour 
-            eps_distances(tau_counter,:) = ...
-                abs(Y_new(NN_idxs(k,:),size(Y_new,2))...
-                -Y_new(fiducial_point,size(Y_new,2)));
-            % increase counter for tau-loop
-            tau_counter = tau_counter + 1;  
+            %eps_distances(taus,:) = abs(...
+            %  Y_new(NN_idxs,end) - Y_new(fiducial_point,end)...
+            %);
+             eps_distances(taus,:) = abs(...
+              x(NN_idxs+tau) - x(fiducial_point+tau)...
+            );
         end
        
         % now compute the minimum epsilon ranges for each delta 
         % neighbourhood size.
-        epsilon_star_delta = zeros(tN,length(delta_points));
+        epsilon_star_delta = zeros(tN, length(delta_points));
         for i = 1:length(delta_points)
             l = delta_points(i);
-            eps_range = sort(eps_distances(:,1:l),2);   
-            epsilon_star_delta(:,i) = eps_range(:,epsilon_points(i));         
-            clear eps_range
+            eps_range = sort(eps_distances(:,1:l),2);
+            epsilon_star_delta(:,i) = eps_range(:, epsilon_points(i));         
         end
         % Since we can not prefer one delta neighbourhood-size, we should 
         % take the minimum of all smallest scales.
-        epsilon_star(:,k) = min(epsilon_star_delta,[],2);                                
+        epsilon_star(:,k) = min(epsilon_star_delta, [], 2);                                
     end
-    clear dist
     
     % average over the fiducial points
     epsilon_min_avrg = mean(epsilon_star,2);
@@ -297,5 +227,4 @@ for ts = 1:size(x,2)
     % this dimension-iteration
     epsilon_mins(:,ts) = epsilon_min_avrg;   
 end
-        
-end
+close(h)

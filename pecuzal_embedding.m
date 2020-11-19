@@ -2,8 +2,8 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 % PECUZAL_EMBEDDING automated phase space reconstruction method.
 %    
 %    Y = PECUZAL_EMBEDDING(X) reconstructs fully automatically the 
-%    (NxM)-matrix Y of phase space vectors from the time series matrix X
-%    of size (N0xM0) where M0 could be 1 (for time series) or larger for
+%    (N-by-M)-matrix Y of phase space vectors from the time series matrix X
+%    of size (N0-by-M0) where M0 could be 1 (for time series) or larger for
 %    multivariate time series.
 %
 %    Y = PECUZAL_EMBEDDING(X, TAU) reconstructs the phase space vectors
@@ -47,16 +47,17 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 %                      L-statistic.
 %      'Tw_factor'   - (default 4) maximal considered time horizon for obtaining the 
 %                      L-statistic as a factor getting multiplied with the Theiler window
-%                      TW = TW_FACTOR * THEILER.
+%                      TW = TW_FACTOR*THEILER.
 %      'max_cycles'  - (default 10) maximum number of embedding cycles the algorithm
 %                      performs after which it stops. 
 %
 %    Example:
 %        roe = @(t,x) [-x(2)-x(3); x(1)+0.2*x(2); 0.2+x(3)*(x(1)-5.7)];  % Rossler system
-%        [t, x] = ode45(roe,[0 200],[1.; .5; 0.5]); % solve ODE
-%        plot3(x(:,1),x(:,2),x(:,3))
-%        y = pecuzal_embedding(x, 0:100)
-%        plot3(y(:,1),y(:,2),x(:,3))
+%        [t, x] = ode45(roe, [0 200], [1.; .5; 0.5]); % solve ODE
+%        plot3(x(:,1), x(:,2), x(:,3))
+%
+%        y = pecuzal_embedding(x, 0:100);
+%        plot3(y(:,1), y(:,2), y(:,3))
 %
 %    Further reading:
 %    H. K. Kraemer et al., … 2021
@@ -157,6 +158,7 @@ epsilons = cell(1,max_num_of_cycles);
 bar = waitbar(0,'PECUZAL embeds your time series');
 while flag
     waitbar(cnt/max_num_of_cycles, bar, sprintf('PECUZAL embeds your time series \nEmbedding cycle %i of maximum %i cycles.', cnt, max_num_of_cycles))
+    cnt
     
     % in the first run we need to find the time series to start with, i.e.
     % we have to encounter xN^2 continuity statistics...
@@ -175,10 +177,18 @@ while flag
         for trial = 1:xN
             % call pecora_embedding_cycle for computing the continuity
             % statistic
+            tic, rng(0)
             [epsilons_{trial}, ~, ~, ~,Y_old,~] = ...
                 pecora_embedding_cycle(x,tau_vals(1:cnt),trial,...
                                    delay_vals,sample_size,theiler,...
                                    alpha,p_val,deltas,norm);
+            toc
+%             tic, rng(0)
+%             [epsilons_2{trial}, ~, ~, ~,Y_old2,~] = ...
+%                 pecora_embedding_cycle2(x,tau_vals(1:cnt),trial,...
+%                                    delay_vals,sample_size,theiler,...
+%                                    alpha,p_val,deltas,norm);
+%             toc
             % preallocate storing vector for the possible peaks of the 
             % continuity statistic
             tau_use = ones(1,xN); 
@@ -216,7 +226,6 @@ while flag
                         if xN>1
                             cost_(i) = Ls_(i)*pks(i);
                         end
-                        clear Y_new
                     end    
                     % pick the peak, which goes along with the least L/cost
                     if xN>1
@@ -229,9 +238,7 @@ while flag
                     Ls(ts) = Ls_(order(1));
                     if xN>1
                         cost(ts) = cost_(order(1));
-                        clear cost_
                     end
-                    clear tau_use_, clear Ls_
                 end              
             end  
               
@@ -270,7 +277,6 @@ while flag
             epsilons = epsilons(1:cnt);
             flag = false;
         end
-        clear Y_old
     
     % in all embedding cycles, but the first one, encounter "only" xN 
     % continuity statistics
@@ -307,7 +313,6 @@ while flag
                     Y_new = embed2(Y_old,x(:,ts),tau_use_(i));
                     Ls_(i) = uzal_cost(Y_new,theiler,k,Tw,sample_size);
                     
-                    clear Y_new
                 end
                 % pick the peak, which goes along with minimum L
                 [~, order] = sort(Ls_);
@@ -316,7 +321,6 @@ while flag
                 tau_use(ts) = tau_use_(1);
                 Ls(ts) = Ls_(order(1));
 
-                clear tau_use_, clear Ls_         
             end
         end
         % Now pick the peak of all the "valid" ones from each time series
@@ -340,7 +344,6 @@ while flag
             epsilons = epsilons(1:cnt);
             flag = false;
         end
-        clear Y_old     
     end
     % increase dimension index counter  
     cnt = cnt + 1;   
