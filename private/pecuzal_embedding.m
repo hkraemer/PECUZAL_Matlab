@@ -1,88 +1,65 @@
-function [Y_tot,tau_vals,ts_vals,LS,epsilons] = pecuzal_embedding(x,varargin)
-% PECUZAL_EMBEDDING is a fully automated phase space reconstruction method
-% based on the ideas of Pecora et al., Chaos 17 (2007) & Uzal et al., Phys.
-% Rev. E (2011).
+function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargin)
+% PECUZAL_EMBEDDING automated phase space reconstruction method.
+%    
+%    Y = PECUZAL_EMBEDDING(X) reconstructs fully automatically the 
+%    (NxM)-matrix Y of phase space vectors from the time series matrix X
+%    of size (N0xM0) where M0 could be 1 (for time series) or larger for
+%    multivariate time series.
 %
-% Minimum input-arguments: 1
-% Maximum input-arguments: 21
+%    Y = PECUZAL_EMBEDDING(X, TAU) reconstructs the phase space vectors
+%    by using vector TAU for which possible delay times the algorithm shall 
+%    look (default [0:50]).
 %
-% [Y, tau_vals, ts_vals, epsilon_mins, Ls] = 
-%                       pecuzal_embedding(x, taus [,Name, Value]);
+%    [Y, TAU_VALS, TS_VALS] = PECUZAL_EMBEDDING(...) provides a vector of (different) 
+%    time delays TAU_VALS chosen by the algorithm and a vector TS_VALS with the
+%    indices between 1 and M0 of chosen time series from matrix X, corresponding to
+%    the delays TAU_VALS.
 %
-% This function embeds the input time series `x` with different delay
-% times tau. `x` can be a multivariate dataset, i.e. many univariate time 
-% series in one matrix. The approach views the problem of choosing all 
-% embedding parameters as being one and the same problem addressable using 
-% a single statistical test formulated directly from the reconstruction 
-% theorems. 
-% In combination with the L-statistic, a cost-function, which evaluates the
-% goodness of a reconstruction, this allows for varying time delays 
-% appropriate to the data and simultaneously helps decide on embedding 
-% dimension. 
+%    [Y, TAU_VALS, TS_VALS, L, E] = PECUZAL_EMBEDDING(...) provides a vector L
+%    of L-statistic values for the reconstruction in each encountered embedding cycle. 
+%    This also includes the L-value of the very last embedding cycle, which does
+%    not contribute to the final embedding, due to an increasing L-value. The cell 
+%    array E contains all epsilon-mins of the continuity statistic as a function of 
+%    TS_VALS for each encountered time series in X.
 %
-% Input:    
-% 
-% Required:
-% `x`               A uni- or multivariate time series, which needs to be
-%                   embedded. If the input data is a multivariate set, the
-%                   algorithm scans all time series and constructs the
-%                   according statistics.
-% Optional:
-% `taus`            A vector defining for which possible delay times tau the
-%                   algorithm shall look (Default is `taus` = 0:50).
+%    ... = PECUZAL_EMBEDDING(..., Name, Value) specifies further optional parameters 
+%    for the embedding algorithm using one or more Name, Value pair arguments.
 %
-% Optional name-value-arguments:
-% `sample_size`     Defines the size of the random phase space vector 
-%                   sample the algorithm considers for each tau value, in 
-%                   order to compute the continuity statistic. This is a
-%                   float from the intervall (0 1]. The size of the 
-%                   considered sample is `sample_size`*length of the current
-%                   phase space trajectory (Default is 1, i.e. all 
-%                   the trajectory points will be considered).
-% `theiler`         Defines a temporal correlation window for which no
-%                   nearest neighbours are considered to be true, since
-%                   they could be direct predecessors or successors of the
-%                   fiducial point (Default is 1). When input `x` is a
-%                   multivariate dataset, `theiler` needs to be
-%                   chosen as the maximum `theiler` from each of the
-%                   time series.
-% `alpha`           The significance level for the continuity statistic
-%                   (Default is `alpha=0.05`)
-% `p`               The binomial parameter used for obtaining the continuity 
-%                   statistic (Default is `p=.5`).
-% `KNN`             The maximal number of points in the delta-neighbourhood. 
-%                   For a range of points from `8:KNN` the minimial 
-%                   epsilon-scale according to the significance level `alpha` 
-%                   and binomial parameter `p` gets computed and the minimum 
-%                   of all considered delta-neighborhood-sizes is finally 
-%                   taken. Must be at least 8 (Default is `KNN=13`) 
-% `k`               The considered number of nearest neighbors for Uzal's
-%                   L-statistic (Default is `k=3`).
-% `Tw_factor`       The maximal considered time horizon for obtaining the 
-%                   L-statistic as a factor getting multiplied with the 
-%                   given `theiler`:`Tw = Tw_factor * theiler` and Default 
-%                   is `Tw_factor = 4`. If `theiler` is set to, say, 
-%                   `theiler = 15` and `Tw_factor` is on its Default the 
-%                   maximal considered time horizon `Tw` for obtaining the 
-%                   L-statistic is `Tw = Tw_factor * 15 = 4 * 15 = 60`.
-% `max_cycles`      The maximum number of embedding cycles the algorithm
-%                   perform after which it breaks, no matter what (Default
-%                   is `max_cycles=10`). 
+%    Optional name-value-arguments:
+%      'sample_size' - (default 1) size of the random phase space vector sample the 
+%                      algorithm considers for each delay value, in order to compute 
+%                      the continuity statistic. This is a float from the intervall
+%                      (0 1]. The size of the considered sample is SAMPLE_SIZE*N 
+%                      (where N is length of the current phase space trajectory).
+%      'theiler'     - (default 1) the temporal correlation window (Theiler window) 
+%                      for which no nearest neighbours are considered, because they 
+%                      could be direct predecessors or successors of the fiducial point. 
+%                      When input X is a multivariate dataset, the Theiler window needs 
+%                      to be chosen as the maximum from each of the time series.
+%      'alpha'       - (default 0.05) significance level for the continuity statistic.
+%      'p'           - (default 0.5) binomial parameter for the continuity statistic.
+%      'KNN'         - (default 13) maximal number of points in the delta-neighbourhood. 
+%                      For a range of points from [8:KNN] the minimial epsilon-scale 
+%                      according to the significance level 'alpha' and binomial parameter
+%                      'p' is computed and the minimum of all considered delta-neighborhood
+%                      sizes is finally chosen. Must be at least 8.
+%      'k'           - (default 3) considered number of nearest neighbors for Uzal's
+%                      L-statistic.
+%      'Tw_factor'   - (default 4) maximal considered time horizon for obtaining the 
+%                      L-statistic as a factor getting multiplied with the Theiler window
+%                      TW = TW_FACTOR * THEILER.
+%      'max_cycles'  - (default 10) maximum number of embedding cycles the algorithm
+%                      performs after which it stops. 
 %
-% Output: 
+%    Example:
+%        roe = @(t,x) [-x(2)-x(3); x(1)+0.2*x(2); 0.2+x(3)*(x(1)-5.7)];  % Rossler system
+%        [t, x] = ode45(roe,[0 200],[1.; .5; 0.5]); % solve ODE
+%        y = pecuzal_embedding(x, 0:100)
 %
-% `Y`               The embedded phase space trajectory            
-% `tau_vals`        The (different) time delays chosen by the algorithm
-% `ts_vals`         The number of the chosen time series for each
-%                   corresponding tau in `tau_vals`
-% `Ls`              The L-statistic values for the reconstruction in each
-%                   encountered embedding cycle. This also includes the
-%                   L-value of the very last embedding cycle, which does
-%                   not contribute to the final embedding, due to an
-%                   increasing L-value.
-% `epsilon_mins`    Continuity statistic. A cell array storing all epsilon-
-%                   mins as a function of `delay_vals` for each encountered 
-%                   time series in input `x`.
+%    Further reading:
+%      Pecora et al., Chaos 17 (2007)
+%      Uzal et al., Phys. Rev. E (2011)
+%    
 %
 % Copyright (c) 2020
 % K. Hauke Kraemer, 
@@ -91,9 +68,13 @@ function [Y_tot,tau_vals,ts_vals,LS,epsilons] = pecuzal_embedding(x,varargin)
 %
 % This program is free software and runs under MIT licence.
 
+%% MATLAB in- and output check
+narginchk(1,21)
+nargoutchk(1,5)
+
 %% Assign input
 
-% define default values
+% default values
 delay_vals = 0:50;
 sample_size = 1.0;
 theiler = 1;
@@ -104,7 +85,7 @@ k = 3;
 Tw = 4;
 max_num_of_cycles = 10;
 
-% define required and optional arguments
+% required and optional arguments
 p = inputParser;
 
 validScalarPosNum1 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && (x <= 1);
@@ -144,17 +125,14 @@ if size(x,1)<size(x,2)
     x = x';
 end
 x_orig = x;
+
 % normalize time series
 x = (x-mean(x))./std(x);
 xN = size(x,2); % number of time series
 
-% Matlab in- and output check
-narginchk(1,21)
-nargoutchk(1,6)
-
 %% Start computation
-% set a flag, in order to tell the while loop when to stop. Each loop
-% stands for encountering a new embedding dimension
+% stop flag for while loop
+% (each loop stands for encountering a new embedding dimension)
 flag = true;
 
 % compute initial L-value, L_init, for all the time series and take the
@@ -178,7 +156,8 @@ epsilons = cell(1,max_num_of_cycles);
 % tell the loop to stop/break
 bar = waitbar(0,'PECUZAL embeds your time series');
 while flag
-    waitbar(cnt/max_num_of_cycles,bar,strcat('PECUZAL embeds your time series \newlineExecuting embedding cycle no.:',num2str(cnt),' out of a maximum of ',num2str(max_num_of_cycles)))
+    waitbar(cnt/max_num_of_cycles, bar, sprintf('PECUZAL embeds your time series \nEmbedding cycle %i of maximum %i cycles.', cnt, max_num_of_cycles))
+    
     % in the first run we need to find the time series to start with, i.e.
     % we have to encounter xN^2 continuity statistics...
     if cnt == 1
@@ -367,6 +346,7 @@ while flag
     cnt = cnt + 1;   
 end
 close(bar)
+
 % final reconstruction
 for m = 1:length(tau_vals)
     if m == 1

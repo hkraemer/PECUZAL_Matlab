@@ -1,5 +1,6 @@
 function [epsilon_mins,gammas,dist_old,dist_,Y_old,fiducials] = pecora_embedding_cycle(varargin)
-% PECORA_EMBEDDING_CYCLE computes the continuity statistic `epsilon_mins`
+% PECORA_EMBEDDING_CYCLE calculates the continuity statistics.
+%    PECORA_EMBEDDING_CYCLE computes the continuity statistic `epsilon_mins`
 % based on the paper of Pecora et al., Chaos 17 (2007).
 %
 % Minimum input-arguments: 2
@@ -76,6 +77,12 @@ function [epsilon_mins,gammas,dist_old,dist_,Y_old,fiducials] = pecora_embedding
 % http://www.pik-potsdam.de
 %
 % This program is free software and runs under MIT licence.
+
+
+%% in- and output check
+narginchk(2,10)
+nargoutchk(1,6)
+
 
 %% Assign input
 
@@ -160,10 +167,6 @@ try
 catch
     norm = 'euc';
 end
-
-% Matlab in- and output check
-narginchk(2,10)
-nargoutchk(1,6)
 
 %% Start computation
 
