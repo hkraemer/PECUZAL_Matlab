@@ -178,7 +178,7 @@ epsilons = cell(1,max_num_of_cycles);
 % tell the loop to stop/break
 bar = waitbar(0,'PECUZAL embeds your time series');
 while flag
-    waitbar(cnt/max_num_of_cycles,bar,strcat('PECUZAL embeds your time series \newline Executing embedding cycle no.:',num2str(cnt),' out of a maximum of ',num2str(max_num_of_cycles)))
+    waitbar(cnt/max_num_of_cycles,bar,strcat('PECUZAL embeds your time series \newlineExecuting embedding cycle no.:',num2str(cnt),' out of a maximum of ',num2str(max_num_of_cycles)))
     % in the first run we need to find the time series to start with, i.e.
     % we have to encounter xN^2 continuity statistics...
     if cnt == 1
