@@ -18,10 +18,7 @@ Getting started
 
 There are two ways of using the proposed PECUZAL method:
 
-- Install as Toolbox. This is the easiest way and allows the usage of the the function `pecuzal_embedding.m` independently from your current working directory.
-It gets treated as a built-in Matlab-function and you do not have to copy any files etc. For this simply download the 'pecuzal-embedding.mltbx' from this repository 
-or from Matlab-Central (hyperref HERE) and double-click for installation. That's it.
-PIC-HERE
+- Install as Toolbox. This is the easiest way and allows the usage of the the function `pecuzal_embedding.m` independently from your current working directory. It gets treated as a built-in Matlab-function and you do not have to copy any files etc. For this simply download the 'pecuzal-embedding.mltbx' from this repository or from Matlab-Central (hyperref HERE) and double-click for installation. That's it.
 - You can also download this repository and copy all functions contained in the `/src`-folder into the working directory, in which you'd like to use the function `pecuzal_embedding.m`.
 
 
