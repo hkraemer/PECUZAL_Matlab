@@ -1,18 +1,22 @@
-function [distances,comp_dist] = all_distances(varargin)
-% ALL_DISTANCES computes all componentwise distances from one point 
-% (a vector) to all other given points, but not all pairwise distances 
-% between all points.
+function [distances, comp_dist] = all_distances(varargin)
+% ALL_DISTANCES Distance between given point to other points in phase space.
+%   D = ALL_DISTANCES(FID_POINT,Y) computes the vector D of length N
+%   of distances between the M-size vector FID_POINT and the M-size 
+%   vectors given in NxM-matrix Y.
 % 
-% This function is meant to determine the neighbourhood of a certain point
-% without computing the whole distances matrix (as being done by the 
-% pdist()-function)
+%   [D, C] = ALL_DISTANCES(FID_POINT,Y) computes the matrix C of size
+%   NxM of distances between point FID_POINT and the points in Y for 
+%   each of the M components separately.
 %
-%       [distances, comp_dist] = all_distances(fid_point,Y,norm) 
+%   ... = ALL_DISTANCES(FID_POINT,Y,NORM) specifies the norm used to
+%   calculate distances:
 %
-% computes all distances, based from the input vector 'fid_point' to all 
-% other points/vectors stored in the input 'Y' and stores it in output 
-% 'distances'. The componentwise distances are stored in output 'comp_dist'
+%     'euc' - (default) Euclidean norm
+%     'max' - maximum norm
 %
+%   This function is meant to determine the neighbourhood of a certain point
+%   without computing the whole distances matrix (as being done by the 
+%   PDIST()-function).
 %
 % Copyright (c) 2020
 % K. Hauke Kraemer, 

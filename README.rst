@@ -1,3 +1,9 @@
+.. image:: https://travis-ci.org/hkraemer/PECUZAL_Matlab.svg?branch=main
+    :target: https://travis-ci.org/hkraemer/PECUZAL_Matlab
+
+.. image:: https://img.shields.io/badge/docs-dev-blue.svg
+    :target: https://hkraemer.github.io/PECUZAL_Matlab/
+
 
 PECUZAL Matlab
 ==============
@@ -10,14 +16,17 @@ give an introduction to its easy usage in three examples. Enjoy Embedding!
 Getting started
 ===============
 
-The method is available as a Toolbox. Simply double-click the ... [...]. The Toolbox is also available on Matlab Central [...]
+There are two ways of using the proposed PECUZAL method:
+
+- Install as Toolbox. This is the easiest way and allows the usage of the the function `pecuzal_embedding.m` independently from your current working directory. It gets treated as a built-in Matlab-function and you do not have to copy any files etc. For this simply download the 'pecuzal-embedding.mltbx' from this repository or from Matlab-Central (hyperref HERE) and double-click for installation. That's it.
+- You can also download this repository and copy all functions contained in the `/src`-folder into the working directory, in which you'd like to use the function `pecuzal_embedding.m`.
+
 
 TODO NOTES
 ==========
 - Proper citation, when accepted
-- installation guide
+- Finish installation guide
 - correct hyperrefs to DynamicalSystems.jl
-- link to doc/usage html-file
 
 NOTE
 ====
@@ -33,7 +42,8 @@ The computation times can be magnitudes higher than in the Julia implementation.
 Documentation and basic usage
 =============================
 
-There is a documentation available including some basic usage examples.
+There is a `documentation <https://hkraemer.github.io/PECUZAL_Matlab/>`_ and a 
+`Matlab Live-Script <https://github.com/hkraemer/PECUZAL_Matlab/blob/main/docs/pecuzal_examples.mlx>`_ available including some basic usage examples.
 
 
 Citing and reference
