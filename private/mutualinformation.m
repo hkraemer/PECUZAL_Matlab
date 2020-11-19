@@ -43,8 +43,8 @@ y = (y-mean(y))/std(y);
 
 try
     tau_max = varargin{2};
-    assert(isscalar(tau_max),'tau-values must be positive integers.')
-    assert(tau_max > 0,'tau-values must be positive integers.')
+    assert(isscalar(tau_max), 'tau-values must be positive integers.')
+    assert(tau_max > 0, 'tau-values must be positive integers.')
 catch
     tau_max = 100;
 end
@@ -75,7 +75,7 @@ Z(:,1)=tau_min:tau_max;
 
 %% Compute mutual information
 try
-    I = mi(y',bins,tau_max);
+    I = mi(y', bins, tau_max);
     Z(:,2) = zeros(1,size(I,3));
     Z(:,2) = I(1,1,:);
 catch
@@ -86,14 +86,10 @@ end
 %% Plotting Automutualinformation against lag tau
 if show
     figure
-    plot(0:length(Z(:,2))-1,Z(:,2),'-.*','LineWidth',2); hold on
+    plot(0:length(Z(:,2))-1, Z(:,2), '-.*', 'LineWidth', 2); hold on
     xlabel('time delay \tau')
     ylabel('mutual information [nats]')
     title('mutual information')
-    set(gca,'LineWidth',2)
-    set(gca,'FontSize',12)
+    set(gca, 'LineWidth', 2)
     grid on
 end
-
-end
-

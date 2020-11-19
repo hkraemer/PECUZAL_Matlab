@@ -156,19 +156,16 @@ gammas = zeros(tN, size(x,2));
 dist_ = cell(1, size(x,2));
 dist_old = NaN * ones(size(x,2), NNN);
 
-% select a random phase space vector sample.
+% select a random phase space vector sample
 if sample_size == 1
     data_samps = 1:NNN;
 else
-    data_samps = datasample(1:YN-delay_vals(end),...
-        NNN,'Replace',false); 
+    data_samps = datasample(1:YN-delay_vals(end), NNN, 'Replace', false); 
 end
 fiducials = data_samps;
 
 % loop over the different time series
-h = waitbar(0,'pecora');
 for ts = 1:size(x, 2)
-waitbar(ts/size(x, 2));
     % preallocate storing vector for continuity statistic
     epsilon_star = zeros(tN, NNN);
     
@@ -196,20 +193,11 @@ waitbar(ts/size(x, 2));
         % loop over the different tau values
         for taus = 1:tN    
             tau = delay_vals(taus);
-            % create new phase space vector.
-            %Y_new = embed2(Y_old, x(:,ts), tau);          
-            
-            % save the distance of the valid neighbour 
-            %eps_distances(taus,:) = abs(...
-            %  Y_new(NN_idxs,end) - Y_new(fiducial_point,end)...
-            %);
-             eps_distances(taus,:) = abs(...
-              x(NN_idxs+tau) - x(fiducial_point+tau)...
-            );
+            eps_distances(taus,:) = abs(x(NN_idxs+tau) - x(fiducial_point+tau));
         end
        
         % now compute the minimum epsilon ranges for each delta 
-        % neighbourhood size.
+        % neighbourhood size
         epsilon_star_delta = zeros(tN, length(delta_points));
         for i = 1:length(delta_points)
             l = delta_points(i);
@@ -227,4 +215,3 @@ waitbar(ts/size(x, 2));
     % this dimension-iteration
     epsilon_mins(:,ts) = epsilon_min_avrg;   
 end
-close(h)
