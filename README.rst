@@ -12,6 +12,8 @@ We introduce the PECUZAL automatic embedding of time series method for Matlab. I
 on the paper [kraemer2020]_ `(Open Source) <https://arxiv.org/abs/2011.07040>`_, where the functionality is explained in detail. Here we
 give an introduction to its easy usage in three examples. Enjoy Embedding! 
 
+.. image:: icon.png
+
 
 Getting started
 ===============

@@ -153,9 +153,6 @@ NNN = floor(sample_size * (YN-delay_vals(end)));
 
 % preallocate output
 epsilon_mins = zeros(tN, size(x,2));
-gammas = zeros(tN, size(x,2));
-dist_ = cell(1, size(x,2));
-dist_old = NaN * ones(size(x,2), NNN);
 
 % select a random phase space vector sample
 if sample_size == 1
@@ -163,7 +160,6 @@ if sample_size == 1
 else
     data_samps = datasample(1:YN-delay_vals(end), NNN, 'Replace', false); 
 end
-fiducials = data_samps;
 
 % loop over the different time series
 for ts = 1:size(x, 2)
