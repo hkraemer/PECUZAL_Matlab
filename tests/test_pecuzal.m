@@ -1,9 +1,10 @@
 %% Test PECUZAL functionality
 
 clear
+addpath('../.')
 
 % Test case for univariate example
-data = load('./data/lorenz_pecora_uni_x.csv');
+data = load('data/lorenz_pecora_uni_x.csv');
 data = data(1:500);
 theiler = 21;
 Tmax = 100;
@@ -11,7 +12,6 @@ K = 3;
 KNN = 14;
 taus = 0:Tmax;
 
-addpath('../src')
 
 [~, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'sample_size', 1, 'K', K, 'KNN', KNN);
 
@@ -25,13 +25,12 @@ assert(tau_vals(3) == 12)
 assert(length(ts_vals) == 3)
 
 % Test case for multivariate example
-addpath('../tests')
-data = load('./data/lorenz_pecora_multi.csv');
+data = load('data/lorenz_pecora_multi.csv');
 data = data(1:500,:);
 theiler = 15;
 Tmax = 100;
 taus = 0:Tmax;
-addpath('../src')
+
 [Y, tau_vals, ts_vals, Ls, eps] = pecuzal_embedding(data, taus, 'theiler', theiler);
 
 assert(tau_vals(1) == tau_vals(2) && tau_vals(1) == 0)
