@@ -39,7 +39,7 @@ function Z = mutualinformation(varargin)
 y = varargin{1};
 assert(isvector(y))
 
-y = (y-mean(y))/std(y);
+y = (y-mean(y)) ./ std(y);
 
 try
     tau_max = varargin{2};
@@ -75,7 +75,7 @@ Z(:,1)=tau_min:tau_max;
 
 %% Compute mutual information
 try
-    I = mi(y', bins, tau_max);
+    I = mi(y, bins, tau_max,'nogui');
     Z(:,2) = zeros(1,size(I,3));
     Z(:,2) = I(1,1,:);
 catch
