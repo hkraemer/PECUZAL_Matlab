@@ -31,5 +31,3 @@ if max_num_of_cycles == cnt
     disp('Forced break of algorithm, due to reaching `max_cycles`')
     flag = true;
 end   
-        
-end
