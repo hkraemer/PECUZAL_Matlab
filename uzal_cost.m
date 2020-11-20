@@ -12,9 +12,14 @@ function L = uzal_cost(varargin)
 %    series length defining the number of considered fiducial points (default 0.2),
 %    and the norm used for distance computations, which can be 'max' for Chebychev norm
 %    or 'euc' for Euclidean norm (default). 
+%
+%    Further reading:
+%    Uzal et al., Phys. Rev. E 84, 016223, 2011
+%
+%    See also PECUZAL_EMBEDDING, PECORA_EMBEDDING_CYCLE
 
 % Copyright (c) 2020
-% K. Hauke Kraemer, 
+% K. Hauke Kraemer, N. Marwan
 % Potsdam Institute for Climate Impact Research, Germany
 % http://www.pik-potsdam.de
 %

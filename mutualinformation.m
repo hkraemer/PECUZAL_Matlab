@@ -1,34 +1,20 @@
 function Z = mutualinformation(varargin)
-%MUTUALINFORMATION computes the automutualinformation values of timeseries 
-% `s` versus the time delayed version of itself.
+% MUTUALINFORMATION computes the automutualinformation values of timeseries.
+%    I = MUTUALINFORMATION(X) returns the auto mutual information I of X,
+%    where X can be a multi-column vector.
 %
-% Minimum input-arguments : 1
-% Maximum input-arguments : 4
+%    I = MUTUALINFORMATION(X, MAXTAU) returns the auto mutual information for
+%    the lags in the range [0 MAXTAU] (default 50).
 %
-%       MI = mutualinformation(s,tau_max,Show,bins)
-% 
+%    I = MUTUALINFORMATION(X, MAXTAU, FLAG) plots auto mutual information 
+%    when FLAG is set to 1 (default 0).
 %
-% Input arguments:
-%
-% s:        The time series, one wishes to compute the auto-
-%           mutualinformation (MI) of.
-% tau_max:  The maximum time lag up to which, starting from 0, MI gets
-%           computed (Default is `tau_max` = 50).
-% Show:     If set to 1, the results get displayed. (Default is `Show`= 0)
-% bins:     Determines how many bins shall be used for the estimation of 
-%           the marginal probabilities. If nothing is specified here the 
-%           number of bins will be automatically computed using 
-%           Freedman-Diaconis' rule.
-%
-% Output:
-%
-% MI:       The timelag-values (first column) and the corresponding 
-%           mutualinformation-values (second column)
-%
-% This function uses mi()-function from N. Marwan's CRP toolbox.
-%
+%    I = MUTUALINFORMATION(X, MAXTAU, FLAG, BINS) uses the number BINS for
+%    the estimation of the marginal probabilities. If not specified, the 
+%    number of bins is computed using Freedman-Diaconis' rule.
+
 % Copyright (c) 2020
-% K. Hauke Kraemer, 
+% K. Hauke Kraemer, N. Marwan
 % Potsdam Institute for Climate Impact Research, Germany
 % http://www.pik-potsdam.de
 %
@@ -61,7 +47,7 @@ end
 
 try
     bins = varargin{4};
-catch  
+catch x 
     [~,edges] = histcounts(y);
     bins = length(edges)-1;
 end

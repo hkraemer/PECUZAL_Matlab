@@ -62,9 +62,11 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 %
 %    Further reading:
 %    H. K. Kraemer et al., … 2021
+%
+%    See also UZAL_COST, PECORA_EMBEDDING_CYCLE
 
 % Copyright (c) 2020
-% K. Hauke Kraemer, 
+% K. Hauke Kraemer, N. Marwan
 % Potsdam Institute for Climate Impact Research, Germany
 % http://www.pik-potsdam.de
 %
@@ -178,7 +180,7 @@ while flag
         for trial = 1:xN
             % call pecora_embedding_cycle for computing the continuity
             % statistic
-            [epsilons_{trial}, ~, ~, ~, Y_old, ~] = ...
+            [epsilons_{trial}, Y_old] = ...
                              pecora_embedding_cycle(x, tau_vals(1:cnt), trial, ...
                              delay_vals, sample_size, theiler, ...
                              alpha, p_val, deltas, norm);
@@ -276,7 +278,7 @@ while flag
     % continuity statistics
     else
         % call pecora_embed_ts for computing the continuity statistic
-        [epsilons{cnt}, ~, ~, ~, Y_old, ~] = pecora_embedding_cycle(x, ...
+        [epsilons{cnt}, Y_old] = pecora_embedding_cycle(x, ...
                   tau_vals(1:cnt), ts_vals(1:cnt), delay_vals, sample_size, ...
                   theiler, alpha, p_val, deltas, norm);          
         % preallocate storing vector for the possible peaks of the continuity

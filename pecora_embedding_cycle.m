@@ -1,4 +1,4 @@
-function [epsilon_mins, gammas, dist_old, dist_, Y_old, fiducials] = pecora_embedding_cycle(varargin)
+function [epsilon_mins, Y_old] = pecora_embedding_cycle(varargin)
 % PECORA_EMBEDDING_CYCLE calculates the continuity statistics.
 %    EPSILON_MINS = PECORA_EMBEDDING_CYCLE(X, TAU) computes vector EPSILON_MINS
 %    containing the values of the continuity statistic based on Pecora et al., 
@@ -20,17 +20,18 @@ function [epsilon_mins, gammas, dist_old, dist_, Y_old, fiducials] = pecora_embe
 %    delta-neighbourhood (default 8) which has to be at least 8, and the norm used for distance 
 %    computations, which can be 'max' for Chebychev norm or 'euc' for Euclidean norm (default). 
 %
-%    [EPSILON_MINS, GAMMA, DIST_OLD, DIST, Y_OLD, FIDUCIALS] = PECORA_EMBEDDING_CYCLE(...)
+%    [EPSILON_MINS, Y_OLD] = PECORA_EMBEDDING_CYCLE(...)
 %    provides the M-by-K matrix GAMMA with the undersampling statistic as a function of the delays
-%    given by the K-sized vector DELAY and the M time series X, the matrix of nearest neighbour  
-%    distances DIST_OLD for each fiducial point for the given trajectory, the cell array DIST
-%    with all nearest neighbour distances to each fiducial point for each value of considered tau
-%    (M matrices of size (number of fiducial points)-by-K), the matrix of the phase space 
-%    trajectory Y_OLD for which the additional tau's are being tested, and the vector FIDUCIALS
-%    of the indices of the chosen fiducial points (defined by the random sample).
+%    given by the K-sized vector DELAY and the M time series X, and the matrix of the phase space 
+%    trajectory Y_OLD for which the additional tau's are being tested.
+%
+%    Further reading:
+%    Pecora et al., Chaos 17 (2007)
+%
+%    See also UZAL_COST, PECUZAL_EMBEDDING
 
 % Copyright (c) 2020
-% K. Hauke Kraemer, 
+% K. Hauke Kraemer, N. Marwan
 % Potsdam Institute for Climate Impact Research, Germany
 % http://www.pik-potsdam.de
 %
