@@ -6,8 +6,8 @@
     <param.company>PIK</param.company>
     <param.summary>Matlab implementation of the PECUZAL automatic embedding method</param.summary>
     <param.description>Toolbox for the repository https://github.com/hkraemer/PECUZAL_Matlab. You can find all necessary information there or in the documentation https://hkraemer.github.io/PECUZAL_Matlab/</param.description>
-    <param.screenshot>${PROJECT_ROOT}/docs/repo_cover.png</param.screenshot>
-    <param.version>1.1</param.version>
+    <param.screenshot>${PROJECT_ROOT}/icon.png</param.screenshot>
+    <param.version>1.2</param.version>
     <param.output>${PROJECT_ROOT}/pecuzal-embedding.mltbx</param.output>
     <param.products.name />
     <param.products.id />
@@ -38,7 +38,8 @@ docs
 tests
 .DS_Store
 README.rst
-.travis.yml</param.exclude.filters>
+.travis.yml
+.nojekyll</param.exclude.filters>
     <param.exclude.pcodedmfiles>true</param.exclude.pcodedmfiles>
     <param.examples />
     <param.demosxml />
@@ -103,15 +104,17 @@ README.rst
       <file>${PROJECT_ROOT}</file>
     </fileset.rootdir>
     <fileset.rootfiles>
+      <file>${PROJECT_ROOT}/Contents.m</file>
       <file>${PROJECT_ROOT}/LICENCE</file>
-      <file>${PROJECT_ROOT}/src</file>
+      <file>${PROJECT_ROOT}/html</file>
+      <file>${PROJECT_ROOT}/mutualinformation.m</file>
+      <file>${PROJECT_ROOT}/pecora_embedding_cycle.m</file>
+      <file>${PROJECT_ROOT}/pecuzal_embedding.m</file>
+      <file>${PROJECT_ROOT}/private</file>
+      <file>${PROJECT_ROOT}/uzal_cost.m</file>
     </fileset.rootfiles>
     <fileset.depfun.included />
-    <fileset.depfun.excluded>
-      <file>${MATLAB_ROOT}/toolbox/matlab/demos/logo.mat</file>
-      <file>/Users/hkraemer/Documents/MATLAB/CRPtool/hist2.m</file>
-      <file>/Users/hkraemer/Documents/MATLAB/error.log</file>
-    </fileset.depfun.excluded>
+    <fileset.depfun.excluded />
     <fileset.package />
     <build-deliverables>
       <file location="${PROJECT_ROOT}" name="pecuzal-embedding.mltbx" optional="false">/Users/hkraemer/Documents/Git/pecuzal-matlab/PECUZAL_Matlab/pecuzal-embedding.mltbx</file>
