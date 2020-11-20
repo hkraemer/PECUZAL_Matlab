@@ -193,7 +193,7 @@ for ts = 1:size(x, 2)
         % loop over the different tau values
         for taus = 1:tN    
             tau = delay_vals(taus);
-            eps_distances(taus,:) = abs(x(NN_idxs+tau) - x(fiducial_point+tau));
+            eps_distances(taus,:) = abs(x(NN_idxs+tau,ts) - x(fiducial_point+tau,ts));
         end
        
         % now compute the minimum epsilon ranges for each delta 
