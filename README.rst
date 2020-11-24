@@ -70,4 +70,4 @@ or as BiBTeX-entry:
 
 Licence
 =======
-This is program is free software and runs under `MIT Licence <https://opensource.org/licenses/MIT>`_.
+This is program is free software and runs under `MIT Licence <https://opensource.org/licenses/MIT>`_. 
