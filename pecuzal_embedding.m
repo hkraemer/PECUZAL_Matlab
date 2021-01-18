@@ -49,7 +49,10 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 %                       by `ΔL` in an embedding cycle (set as a positive number, i.e. an 
 %                       absolute value of `ΔL`). 
 %      'max_cycles'  - (default 10) maximum number of embedding cycles the algorithm
-%                      performs after which it stops. 
+%                      performs after which it stops.       
+%      'econ'        - (default False) Economy-mode for L-statistic computation. Instead of
+%                      computing L-statistics for time horizons `2:Tw`, here we only compute them for
+%                      `2:2:Tw`.
 %
 %    Example:
 %        % Reconstruct phase space vectors from the 2nd component of the Roessler system
@@ -73,7 +76,7 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 % This program is free software and runs under MIT licence.
 
 %% in- and output check
-narginchk(1,21)
+narginchk(1,23)
 nargoutchk(1,5)
 
 %% Assign input
@@ -88,6 +91,7 @@ deltas = 13;
 threshold = 0;
 k = 3;
 max_num_of_cycles = 10;
+econ = false;
 
 % required and optional arguments
 p = inputParser;
@@ -96,6 +100,7 @@ validScalarPosNum1 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && (x <= 1);
 validScalarPosNum2 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && rem(x,1)==0;
 validScalarPosNum3 = @(x) isnumeric(x) && isscalar(x) && (x > 0);
 validDimension = @(x) isnumeric(x) && ismatrix(x);
+validType = @(x) islogical(x);
 
 addRequired(p,'x',validDimension);
 addOptional(p,'taus',delay_vals,validDimension);
@@ -107,6 +112,7 @@ addParameter(p,'KNN',deltas,validScalarPosNum2);
 addParameter(p,'k',k,validScalarPosNum2);
 addParameter(p,'threshold',threshold,validScalarPosNum3);
 addParameter(p,'max_cycles',max_num_of_cycles,validScalarPosNum2);
+addParameter(p,'econ',econ,validType);
 
 % parse input arguments
 parse(p,x,varargin{:})
@@ -122,6 +128,7 @@ deltas = p.Results.KNN;
 k = p.Results.k;
 threshold = p.Results.threshold;
 max_num_of_cycles = p.Results.max_cycles;
+econ = p.Results.econ;
 
 threshold = -threshold;
 
@@ -206,7 +213,7 @@ while flag
                         Y_new = embed2(Y_old, x(:,ts), tau_use_(i));
                         Ls_(i) = uzal_cost_pecuzal(Y_old, Y_new, ...
                             delay_vals(end), 'theiler', theiler,...
-                            'k', k);
+                            'k', k, 'econ', econ);
                     end    
                     % pick the peak, which goes along with the least L/cost
                     [~, order] = sort(Ls_);
@@ -283,7 +290,7 @@ while flag
                     Y_new = embed2(Y_old, x(:,ts), tau_use_(i));
                     Ls_(i) = uzal_cost_pecuzal(Y_old, Y_new, ...
                         delay_vals(end), 'theiler', theiler,...
-                        'k', k);
+                        'k', k, 'econ', econ);
                 end
                 % pick the peak, which goes along with minimum L
                 [~, order] = sort(Ls_);

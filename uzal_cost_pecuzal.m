@@ -22,6 +22,9 @@ function L_decrease = uzal_cost_pecuzal(Y, Y_trial, varargin)
 %                      to be chosen as the maximum from each of the time series.
 %      'k'           - (default 3) considered number of nearest neighbors for Uzal's
 %                      L-statistic.
+%      'econ'        - (default False) Economy-mode for L-statistic computation. Instead of
+%                      computing L-statistics for time horizons `2:Tw`, here we only compute them for
+%                      `2:2:Tw`.
 %
 %    Further reading:
 %    Uzal et al., Phys. Rev. E 84, 016223, 2011
@@ -36,7 +39,7 @@ function L_decrease = uzal_cost_pecuzal(Y, Y_trial, varargin)
 % This program is free software and runs under MIT licence.
 
 %% in- and output check
-narginchk(1,7)
+narginchk(1,9)
 nargoutchk(1,1)
 
 %% Assign input
@@ -45,6 +48,7 @@ nargoutchk(1,1)
 Tw = 50;
 theiler = 1;
 k = 3;
+econ = false;
 
 % required and optional arguments
 p = inputParser;
@@ -52,12 +56,14 @@ p = inputParser;
 validScalarPosNum1 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && rem(x,1)==0;
 validScalarPosNum2 = @(x) isnumeric(x) && isscalar(x) && (x > 0);
 validDimension = @(x) isnumeric(x) && ismatrix(x);
+validType = @(x) islogical(x);
 
 addRequired(p,'Y',validDimension);
 addRequired(p,'Y_trial',validDimension);
 addOptional(p,'Tw',Tw,validScalarPosNum2);
 addParameter(p,'theiler',theiler,validScalarPosNum1);
 addParameter(p,'k',k,validScalarPosNum2);
+addParameter(p,'econ',econ,validType);
 
 % parse input arguments
 parse(p, Y, Y_trial, varargin{:})
@@ -68,6 +74,7 @@ Y_trial = p.Results.Y_trial;
 Tw = p.Results.Tw;
 theiler = p.Results.theiler;
 k = p.Results.k;
+econ = p.Results.econ;
 
 norm = 'euc';
 metric = 'euclidean';
@@ -93,11 +100,17 @@ if NNN > 2500
    use_vectorized = 1;
 end
 
+if econ
+    tws = 2:2:Tw; % start at 2 will eliminate bad results for noise
+else
+    tws = 2:Tw; % start at 2 will eliminate bad results for noise
+end
+
 % preallocation
 epsilon_k2 = zeros(1,NNN);          % neighborhood size
 epsilon_k2_trial = zeros(1,NNN);    % neighborhood size
-E2 = zeros(NNN,Tw);                 % conditional variance
-E2_trial = zeros(NNN,Tw);           % conditional variance
+E2 = zeros(NNN,length(tws));                 % conditional variance
+E2_trial = zeros(NNN,length(tws));           % conditional variance
 neighborhood = zeros(k+1,D1);       % epsilon neighbourhood
 neighborhood_trial = zeros(k+1,D2); % epsilon neighbourhood
 
@@ -106,7 +119,8 @@ dist_former = 99999999;
 
 % loop over each time horizon
 cnt = 1;
-for T = 2:Tw    % start at 2 will eliminate bad results for noise
+for j = 1:length(tws) 
+    T = tws(j);
     NN = length(Y_trial)-T;
     if NN < 1
         error("Time series too short for given possible delays and Theiler window to find enough nearest neighbours")
@@ -180,8 +194,8 @@ for T = 2:Tw    % start at 2 will eliminate bad results for noise
     % increased
     
     % Average E2 over all prediction horizons          
-    E2_avrg = mean(E2(1:NN,1:T),2);                   % Eq. 15
-    E2_avrg_trial = mean(E2_trial(1:NN,1:T),2);
+    E2_avrg = mean(E2(1:NN,1:cnt),2);                   % Eq. 15
+    E2_avrg_trial = mean(E2_trial(1:NN,1:cnt),2);
     sigma2 = E2_avrg ./ epsilon_k2(1:NN)'; % noise amplification σ², Eq. 17
     sigma2_trial = E2_avrg_trial ./ epsilon_k2_trial(1:NN)'; 
     sigma2_avrg = mean(sigma2); % averaged value of the noise amplification, Eq. 18
