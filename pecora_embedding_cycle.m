@@ -17,13 +17,11 @@ function [epsilon_mins, Y_old] = pecora_embedding_cycle(varargin)
 %    size of the random phase space vector sample (default 0.1), the Theiler window THEILER 
 %    (default 1), the significance level ALPHA (default 0.05) and binomial parameter P
 %    (default 0.5) for the continuity statistic, the maximal number of points KNN in the 
-%    delta-neighbourhood (default 8) which has to be at least 8, and the norm used for distance 
+%    delta-neighbourhood (default 13) which has to be at least 8, and the norm used for distance 
 %    computations, which can be 'max' for Chebychev norm or 'euc' for Euclidean norm (default). 
 %
 %    [EPSILON_MINS, Y_OLD] = PECORA_EMBEDDING_CYCLE(...)
-%    provides the M-by-K matrix GAMMA with the undersampling statistic as a function of the delays
-%    given by the K-sized vector DELAY and the M time series X, and the matrix of the phase space 
-%    trajectory Y_OLD for which the additional tau's are being tested.
+%    provides the phase space trajectory Y_OLD for which the additional tau's are being tested.
 %
 %    Further reading:
 %    Pecora et al., Chaos 17 (2007)
@@ -112,7 +110,7 @@ end
 try
     deltas = varargin{9};
 catch
-    deltas = 8;
+    deltas = 13;
 end
 
 methLib = {'euc', 'max'}; % the possible norms
@@ -150,7 +148,6 @@ YN = length(Y_old);
 
 % length of the reference point trajectory
 NNN = floor(sample_size * (YN-delay_vals(end)));
-
 % preallocate output
 epsilon_mins = zeros(tN, size(x,2));
 
@@ -173,7 +170,7 @@ for ts = 1:size(x, 2)
         
         % compute distances to all other points in dimension d.
         [distances, ~] = all_distances(Y_old(fiducial_point,:),...
-                                      Y_old(1:end-delay_vals(end),:), norm);
+                                      Y_old(1:NNN,:), norm);
         % sort these distances in ascending order
         [~,ind] = sort(distances);
         
@@ -183,14 +180,14 @@ for ts = 1:size(x, 2)
         ind(ismember(ind, idx)) = [];
         % construct neighbourhood
         NN_idxs = ind(1:neighbours)'; % indices of the valid neighbours 
-
+        
         % preallocate storing vector for distances of epsilon neighborhood
         eps_distances = zeros(tN, neighbours);
         
         % loop over the different tau values
         for taus = 1:tN    
             tau = delay_vals(taus);
-            eps_distances(taus,:) = abs(x(NN_idxs+tau,ts) - x(fiducial_point+tau,ts));
+            eps_distances(taus,:) = abs(x(fiducial_point+tau,ts) - x(NN_idxs+tau,ts));
         end
        
         % now compute the minimum epsilon ranges for each delta 
@@ -199,15 +196,16 @@ for ts = 1:size(x, 2)
         for i = 1:length(delta_points)
             l = delta_points(i);
             eps_range = sort(eps_distances(:,1:l),2);
-            epsilon_star_delta(:,i) = eps_range(:, epsilon_points(i));         
+            epsilon_star_delta(:,i) = eps_range(:, epsilon_points(i)); 
         end
         % Since we can not prefer one delta neighbourhood-size, we should 
         % take the minimum of all smallest scales.
-        epsilon_star(:,k) = min(epsilon_star_delta, [], 2);                                
+        epsilon_star(:,k) = min(epsilon_star_delta, [], 2); 
+
     end
-    
     % average over the fiducial points
     epsilon_min_avrg = mean(epsilon_star,2);
+
     % save all epsilon min vals corresponding to the different tau-vals for
     % this dimension-iteration
     epsilon_mins(:,ts) = epsilon_min_avrg;   

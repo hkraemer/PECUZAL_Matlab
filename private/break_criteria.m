@@ -1,4 +1,4 @@
-function flag = break_criteria(tau_vals, LS, max_num_of_cycles, cnt, L_init)
+function flag = break_criteria(tau_vals, LS, max_num_of_cycles, cnt, threshold)
 % BREAK_CRITERIA returns a boolean, which is `true`, whenever one of the
 % break criteria of the pecuzal method is met. Otherwise it returns `false`.
 %
@@ -12,17 +12,15 @@ function flag = break_criteria(tau_vals, LS, max_num_of_cycles, cnt, L_init)
 flag = false;
 % if there hasn't been any valid peak to choose from, break
 if any(isnan(tau_vals))
-    disp('Algorithm stopped due to non-valid time lags. NO valid embedding! (see the undersampling and FNN statistic)')
+    disp('Algorithm stopped due to non-valid time lags. NO valid embedding! (see the continuity statistic)')
     flag = true;
 end
+
 % break, if L can not be reduced anymore
-if cnt == 1
-    if LS(cnt)>L_init
-        disp('Algorithm stopped due to non-decreasing L-value. NO valid embedding achieved.')
-        flag = true;
-    end
-        
-elseif LS(cnt)>LS(cnt-1)
+if cnt == 1 && LS(cnt) > threshold
+    disp('Algorithm stopped due toincreasing L-values in the first embedding cycle. NO valid embedding achieved.')
+    flag = true;      
+elseif cnt > 1 && LS(cnt) > threshold
     disp('Algorithm stopped due to minimum L-value reached. VALID embedding achieved.')
     flag = true;
 end
