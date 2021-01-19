@@ -18,7 +18,7 @@ end
 
 % break, if L can not be reduced anymore
 if cnt == 1 && LS(cnt) > threshold
-    disp('Algorithm stopped due toincreasing L-values in the first embedding cycle. NO valid embedding achieved.')
+    disp('Algorithm stopped due to increasing L-values in the first embedding cycle. NO valid embedding achieved.')
     flag = true;      
 elseif cnt > 1 && LS(cnt) > threshold
     disp('Algorithm stopped due to minimum L-value reached. VALID embedding achieved.')
