@@ -6,7 +6,7 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 %    of size (N0-by-M0) where M0 could be 1 (for time series) or larger for
 %    multivariate time series.
 %
-%    Y = PECUZAL_EMBEDDING(X, TAU) reconstructs the phase space vectors
+%    Y = PECUZAL_EMBEDDING(X, TAUS) reconstructs the phase space vectors
 %    by using vector TAU for which possible delay times the algorithm shall 
 %    look (default [0:50]).
 %
@@ -45,11 +45,14 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 %                      sizes is finally chosen. Must be at least 8.
 %      'k'           - (default 3) considered number of nearest neighbors for Uzal's
 %                      L-statistic.
-%      'Tw_factor'   - (default 4) maximal considered time horizon for obtaining the 
-%                      L-statistic as a factor getting multiplied with the Theiler window
-%                      TW = TW_FACTOR*THEILER.
+%      'L_thres'     - (default 0) The algorithm breaks, when this threshold is exceeded
+%                       by `ΔL` in an embedding cycle (set as a positive number, i.e. an 
+%                       absolute value of `ΔL`). 
 %      'max_cycles'  - (default 10) maximum number of embedding cycles the algorithm
-%                      performs after which it stops. 
+%                      performs after which it stops.       
+%      'econ'        - (default False) Economy-mode for L-statistic computation. Instead of
+%                      computing L-statistics for time horizons `2:Tw`, here we only compute them for
+%                      `2:2:Tw`.
 %
 %    Example:
 %        % Reconstruct phase space vectors from the 2nd component of the Roessler system
@@ -63,7 +66,7 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 %    Further reading:
 %    H. K. Kraemer et al., … 2021
 %
-%    See also UZAL_COST, PECORA_EMBEDDING_CYCLE
+%    See also PECORA_EMBEDDING_CYCLE, UZAL_COST_PECUZAL, UZAL_COST
 
 % Copyright (c) 2020
 % K. Hauke Kraemer, N. Marwan
@@ -73,7 +76,7 @@ function [Y_tot, tau_vals, ts_vals, LS, epsilons] = pecuzal_embedding(x, varargi
 % This program is free software and runs under MIT licence.
 
 %% in- and output check
-narginchk(1,21)
+narginchk(1,23)
 nargoutchk(1,5)
 
 %% Assign input
@@ -85,16 +88,19 @@ theiler = 1;
 alpha = 0.05;
 p_val = 0.5;
 deltas = 13;
+threshold = 0;
 k = 3;
-Tw = 4;
 max_num_of_cycles = 10;
+econ = false;
 
 % required and optional arguments
 p = inputParser;
 
 validScalarPosNum1 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && (x <= 1);
 validScalarPosNum2 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && rem(x,1)==0;
+validScalarPosNum3 = @(x) isnumeric(x) && isscalar(x) && (x > 0);
 validDimension = @(x) isnumeric(x) && ismatrix(x);
+validType = @(x) islogical(x);
 
 addRequired(p,'x',validDimension);
 addOptional(p,'taus',delay_vals,validDimension);
@@ -104,8 +110,9 @@ addParameter(p,'alpha',alpha,validScalarPosNum1);
 addParameter(p,'p',p_val,validScalarPosNum1);
 addParameter(p,'KNN',deltas,validScalarPosNum2);
 addParameter(p,'k',k,validScalarPosNum2);
-addParameter(p,'Tw_factor',Tw,validScalarPosNum2);
+addParameter(p,'L_thres',threshold,validScalarPosNum3);
 addParameter(p,'max_cycles',max_num_of_cycles,validScalarPosNum2);
+addParameter(p,'econ',econ,validType);
 
 % parse input arguments
 parse(p,x,varargin{:})
@@ -119,8 +126,11 @@ alpha = p.Results.alpha;
 p_val = p.Results.p;
 deltas = p.Results.KNN;
 k = p.Results.k;
-Tw = p.Results.Tw_factor * theiler;
+threshold = p.Results.L_thres;
 max_num_of_cycles = p.Results.max_cycles;
+econ = p.Results.econ;
+
+threshold = -threshold;
 
 norm = 'euc';
 
@@ -139,14 +149,6 @@ xN = size(x,2); % number of time series
 % (each loop stands for encountering a new embedding dimension)
 flag = true;
 
-% compute initial L-value, L_init, for all the time series and take the
-% minimum
-L_inits = zeros(1, xN);
-for i = 1:xN
-    L_inits(i) = uzal_cost(x(:,i), theiler, k, Tw, sample_size);
-end
-L_init = min(L_inits);
-
 % set index-counter for the while loop
 cnt = 1;
 
@@ -162,7 +164,7 @@ bar = waitbar(0,'PECUZAL embeds your time series');
 while flag
     waitbar(cnt/max_num_of_cycles, bar, ...
             sprintf('PECUZAL embeds your time series \nEmbedding cycle %i of maximum %i cycles.', cnt, max_num_of_cycles))
-    
+        
     % in the first run we need to find the time series to start with, i.e.
     % we have to encounter xN^2 continuity statistics...
     if cnt == 1
@@ -171,11 +173,7 @@ while flag
         tau_vals__ = zeros(1,xN);
         ts_vals__ = zeros(1,xN);
         LS_ = zeros(1,xN);
-        % in the multivariate case we weight each peak with the according
-        % L-value
-        if xN > 1
-            COST_ = zeros(1,xN);
-        end    
+    
         % Loop over the potential initial time series
         for trial = 1:xN
             % call pecora_embedding_cycle for computing the continuity
@@ -189,9 +187,7 @@ while flag
             % continuity statistic
             tau_use = ones(1,xN); 
             Ls = zeros(1,xN);
-            if xN>1
-                cost = zeros(1,xN);
-            end
+            
             % loop over the statistics for each time series
             for ts = 1:xN
                 % extract the corresponding continuity statistic
@@ -205,48 +201,36 @@ while flag
                     tau_use(ts)= NaN;
                     Ls(ts) = NaN;
                     continue
-                else                 
+                else
                     tau_use_ = zeros(1, length(pks));
                     Ls_ = zeros(1, length(pks));
-                    if xN>1
-                        cost_ = zeros(1, length(pks));
-                    end
                     % loop over the local maxima
                     for i = 1:length(pks)
                         % assign tau value to this peak; minus 1, because 
                         % one zero padding 
                         tau_use_(i) = delay_vals(locs(i)-1);                      
-                        % compute L-statistic
+                        % compute L-decrease
                         Y_new = embed2(Y_old, x(:,ts), tau_use_(i));
-                        Ls_(i) = uzal_cost(Y_new, theiler, k, Tw, sample_size);
-                        if xN>1
-                            cost_(i) = Ls_(i)*pks(i);
-                        end
+                        Ls_(i) = uzal_cost_pecuzal(Y_old, Y_new, ...
+                            delay_vals(end), 'theiler', theiler,...
+                            'k', k, 'econ', econ);
                     end    
                     % pick the peak, which goes along with the least L/cost
-                    if xN>1
-                        [~, order] = sort(cost_);
-                    else
-                        [~, order] = sort(Ls_);
-                    end
+                    [~, order] = sort(Ls_);
                     tau_use_ = tau_use_(order);
                     tau_use(ts) = tau_use_(1);
                     Ls(ts) = Ls_(order(1));
-                    if xN>1
-                        cost(ts) = cost_(order(1));
-                    end
                 end              
             end  
               
             if xN>1               
                 % Again, take the combination of time series, which yield a
-                % minimum cost (=peak-height*L)
-                [~,order] = sort(cost);
+                % minimum L decrease
+                [~,order] = sort(Ls);
                 tau_use = tau_use(order);             
                 tau_vals__(trial) = tau_use(1);
                 ts_vals__(trial) = order(1);
                 LS_(trial) = Ls(order(1));
-                COST_(trial) = cost(order(1));
             else
                 tau_vals__(trial) = tau_use(1);
                 ts_vals__(trial) = 1;
@@ -255,28 +239,25 @@ while flag
         end
         % now compare the results for all different initial time series and
         % store the values. Sort by the smallest amount of L / cost
-        if xN>1
-            [~,ind] = sort(COST_);
-        else
-            [~,ind] = sort(LS_);
-        end
+        [~,ind] = sort(LS_);
         LS(1) = LS_(ind(1));
         ts_vals(1) = ind(1);
         ts_vals(2) = ts_vals__(ind(1)); 
         tau_vals(2) = tau_vals__(ind(1));
         epsilons{1} = epsilons_{ind(1)};
         % check break criteria
-        if break_criteria(tau_vals, LS, max_num_of_cycles, cnt, L_init)
+        if break_criteria(tau_vals, LS, max_num_of_cycles, cnt, threshold)
             tau_vals = tau_vals(1:cnt);
             ts_vals = ts_vals(1:cnt);
-            LS = LS(1:cnt);
-            epsilons = epsilons(1:cnt);
+            LS = LS(1:cnt-1);
+            epsilons = epsilons(1:cnt-1);
             flag = false;
         end
     
     % in all embedding cycles, but the first one, encounter "only" xN 
     % continuity statistics
     else
+
         % call pecora_embed_ts for computing the continuity statistic
         [epsilons{cnt}, Y_old] = pecora_embedding_cycle(x, ...
                   tau_vals(1:cnt), ts_vals(1:cnt), delay_vals, sample_size, ...
@@ -305,10 +286,11 @@ while flag
                     % now assign the tau value to this peak, minus 1, 
                     % because one zero padding
                     tau_use_(i) = delay_vals(locs(i)-1);  
-                    % compute L-statistic
+                    % compute L-decrease
                     Y_new = embed2(Y_old, x(:,ts), tau_use_(i));
-                    Ls_(i) = uzal_cost(Y_new, theiler, k, Tw,sample_size);
-                    
+                    Ls_(i) = uzal_cost_pecuzal(Y_old, Y_new, ...
+                        delay_vals(end), 'theiler', theiler,...
+                        'k', k, 'econ', econ);
                 end
                 % pick the peak, which goes along with minimum L
                 [~, order] = sort(Ls_);
@@ -333,11 +315,11 @@ while flag
             LS(cnt) = Ls;
         end
         % check break criteria
-        if break_criteria(tau_vals, LS, max_num_of_cycles, cnt, L_init)
+        if break_criteria(tau_vals, LS, max_num_of_cycles, cnt, threshold)
             tau_vals = tau_vals(1:cnt);
             ts_vals = ts_vals(1:cnt);
-            LS = LS(1:cnt);
-            epsilons = epsilons(1:cnt);
+            LS = LS(1:cnt-1);
+            epsilons = epsilons(1:cnt-1);
             flag = false;
         end
     end
