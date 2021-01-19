@@ -8,36 +8,54 @@ data = load('data/lorenz_pecora_uni_x.csv');
 data = data(1:500);
 theiler = 21;
 Tmax = 100;
-K = 3;
-KNN = 14;
+
 taus = 0:Tmax;
 
+[~, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler);
 
-[~, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'sample_size', 1, 'K', K, 'KNN', KNN);
+assert(-0.6134 < sum(Ls))
+assert(sum(Ls) < -0.6133)
+assert(tau_vals(2) == 21)
+assert(tau_vals(3) == 13)
+assert(tau_vals(4) == 78)
 
-assert(-1.68 < Ls(1) && Ls(1) < -1.67)
-assert(-1.72 < Ls(2) && Ls(2) < -1.71)
-assert(-1.71 < Ls(3) && Ls(3) < -1.70)
+assert(length(ts_vals) == 4)
 
-assert(tau_vals(2) == 58)
-assert(tau_vals(3) == 12)
+[~, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'econ', true);
 
-assert(length(ts_vals) == 3)
+assert(-0.6078 < sum(Ls))
+assert(sum(Ls) < -0.6077)
+assert(tau_vals(2) == 21)
+assert(tau_vals(3) == 13)
+assert(tau_vals(4) == 78)
+
+assert(length(ts_vals) == 4)
 
 % Test case for multivariate example
 data = load('data/lorenz_pecora_multi.csv');
-data = data(1:500,:);
+data = data(1:500,1:2);
 theiler = 15;
 Tmax = 100;
 taus = 0:Tmax;
 
-[Y, tau_vals, ts_vals, Ls, eps] = pecuzal_embedding(data, taus, 'theiler', theiler);
+[Y, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler);
 
-assert(tau_vals(1) == tau_vals(2) && tau_vals(1) == 0)
-
+assert(size(Y,2)==2)
+assert(tau_vals(1) == 0)
+assert(tau_vals(2) == 0)
 assert(ts_vals(1) == 2)
-assert(ts_vals(2) == 3)
-assert(length(ts_vals) == 2)
+assert(ts_vals(2) == 1)
 
-assert(-1.69 < Ls(1) && Ls(1) < -1.68)
-assert(-1.68 < Ls(2) && Ls(2) < -1.67)
+assert(sum(Ls) < -0.5505736)
+
+[Y, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'econ', true);
+
+assert(size(Y,2)==2)
+assert(tau_vals(1) == 0)
+assert(tau_vals(2) == 0)
+assert(ts_vals(1) == 2)
+assert(ts_vals(2) == 1)
+
+assert(sum(Ls) < -0.544942)
+
+

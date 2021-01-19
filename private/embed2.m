@@ -25,10 +25,8 @@ if size(x,1) < size(x,2)
     x = x';
 end
 
-
-N = size(Y,1); 
-
-
-M = N - tau;
-
-Y2 = [Y(1:M, :) x(1+tau:N)];
+N = size(Y,1);
+MM = length(x);
+MMM = MM - tau;
+M = min([N, MMM]);
+Y2 = [Y(1:M, :) x(1+tau:tau+M)];
