@@ -319,7 +319,7 @@ while flag
             tau_vals = tau_vals(1:cnt);
             ts_vals = ts_vals(1:cnt);
             LS = LS(1:cnt-1);
-            epsilons = epsilons(1:cnt-1);
+            epsilons = epsilons(1:cnt);
             flag = false;
         end
     end
