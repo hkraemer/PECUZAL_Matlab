@@ -21,6 +21,11 @@ assert(tau_vals(4) == 78)
 
 assert(length(ts_vals) == 4)
 
+[~, tau_vals, ~, ~, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'L_thres', 0.2);
+
+assert(length(tau_vals) == 2)
+
+
 [~, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'econ', true);
 
 assert(-0.6078 < sum(Ls))

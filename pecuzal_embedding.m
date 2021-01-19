@@ -110,7 +110,7 @@ addParameter(p,'alpha',alpha,validScalarPosNum1);
 addParameter(p,'p',p_val,validScalarPosNum1);
 addParameter(p,'KNN',deltas,validScalarPosNum2);
 addParameter(p,'k',k,validScalarPosNum2);
-addParameter(p,'threshold',threshold,validScalarPosNum3);
+addParameter(p,'L_thres',threshold,validScalarPosNum3);
 addParameter(p,'max_cycles',max_num_of_cycles,validScalarPosNum2);
 addParameter(p,'econ',econ,validType);
 
@@ -126,7 +126,7 @@ alpha = p.Results.alpha;
 p_val = p.Results.p;
 deltas = p.Results.KNN;
 k = p.Results.k;
-threshold = p.Results.threshold;
+threshold = p.Results.L_thres;
 max_num_of_cycles = p.Results.max_cycles;
 econ = p.Results.econ;
 
