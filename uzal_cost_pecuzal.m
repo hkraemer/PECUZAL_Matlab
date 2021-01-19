@@ -95,11 +95,6 @@ NNN = length(Y_trial)-1;
 D1 = size(Y,2);
 D2 = size(Y_trial,2);
 
-use_vectorized = 0;
-if NNN > 2500 
-   use_vectorized = 1;
-end
-
 if econ
     tws = 2:2:Tw; % start at 2 will eliminate bad results for noise
 else
@@ -161,33 +156,16 @@ for j = 1:length(tws)
         epsilon_k2_trial(fiducial_point) = (2/(k*(k+1))) * sum(pd_trial.^2);  % Eq. 16
     
         %% estimate E2
-        % series of neighbours
-        idx = [eps_idx' ones(k+1,1)]*[ones(1,Tw); 1:Tw];
-        idx_trial = [eps_idx_trial' ones(k+1,1)]*[ones(1,Tw); 1:Tw];
-
-        if use_vectorized
-            % neighborhood T timesteps ahead
-            eps_ball = reshape(Y(idx,:),k+1, Tw, D1);
-            eps_ball = permute(eps_ball,[1 3 2]);
-            eps_ball_trial = reshape(Y_trial(idx_trial,:),k+1, Tw, D2);
-            eps_ball_trial = permute(eps_ball_trial,[1 3 2]);
-            % center of mass
-            u_k = (sum(eps_ball,1)) / (k+1);
-            u_k_trial = (sum(eps_ball_trial,1)) / (k+1);
-            % compute E2
-            E2(fiducial_point,cnt) = squeeze(sum(sqrt(sum((eps_ball - u_k).^2)).^2) / (k+1));
-            E2_trial(fiducial_point,cnt) = squeeze(sum(sqrt(sum((eps_ball_trial - u_k_trial).^2)).^2) / (k+1));
-        else
-            % determine neighborhood T timesteps ahead
-            eps_ball = Y(eps_idx+T,:);
-            eps_ball_trial = Y_trial(eps_idx_trial+T,:);
-            % compute center of mass
-            u_k = sum(eps_ball) / (k+1);  % Eq.14
-            u_k_trial = sum(eps_ball_trial) / (k+1);  % Eq.14
-            % compute E_k2
-            E2(fiducial_point,cnt) = sum(sqrt(sum((eps_ball-u_k).^2)).^2) / (k+1);  % Eq.13 
-            E2_trial(fiducial_point,cnt) = sum(sqrt(sum((eps_ball_trial-u_k_trial).^2)).^2) / (k+1);  % Eq.13 
-        end
+        % determine neighborhood T timesteps ahead
+        eps_ball = Y(eps_idx+T,:);
+        eps_ball_trial = Y_trial(eps_idx_trial+T,:);
+        % compute center of mass
+        u_k = sum(eps_ball) / (k+1);  % Eq.14
+        u_k_trial = sum(eps_ball_trial) / (k+1);  % Eq.14
+        % compute E_k2
+        E2(fiducial_point,cnt) = sum(sqrt(sum((eps_ball-u_k).^2)).^2) / (k+1);  % Eq.13 
+        E2_trial(fiducial_point,cnt) = sum(sqrt(sum((eps_ball_trial-u_k_trial).^2)).^2) / (k+1);  % Eq.13 
+    
         
     end
     % compute distance of L-values and check whether that distance can be
