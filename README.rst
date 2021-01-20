@@ -4,13 +4,19 @@
 .. image:: https://img.shields.io/badge/docs-dev-blue.svg
     :target: https://hkraemer.github.io/PECUZAL_Matlab/
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4451879.svg
+   :target: https://doi.org/10.5281/zenodo.4451879
+
+.. |View PECUZAL embedding algorithm for Matlab on File Exchange| image:: https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg
+  :target: https://de.mathworks.com/matlabcentral/fileexchange/86004-pecuzal-embedding-algorithm-for-matlab
+
 
 PECUZAL Matlab
 ==============
 
 We introduce the PECUZAL automatic embedding of time series method for Matlab. It is solely based
 on the paper [kraemer2020]_ `(Open Source) <https://arxiv.org/abs/2011.07040>`_, where the functionality is explained in detail. Here we
-give an introduction to its easy usage in three examples. Enjoy Embedding! 
+give an introduction to its easy usage in three examples. Enjoy Embedding!
 
 .. image:: icon.png
 
@@ -35,7 +41,7 @@ NOTE
 For performance reasons we recommend to use the implementation
 in the `Julia language <https://juliadynamics.github.io/DynamicalSystems.jl/latest/embedding/unified/>`_,
 in order to get fast results, especially in the multivariate case. Moreover,
-it is well documented and embedded in the 
+it is well documented and embedded in the
 `DynamicalSystems.jl <https://juliadynamics.github.io/DynamicalSystems.jl/dev/>`_ ecosystem.
 The computation times can be magnitudes higher than in the Julia implementation.
 
@@ -43,7 +49,7 @@ The computation times can be magnitudes higher than in the Julia implementation.
 Documentation and basic usage
 =============================
 
-There is a `documentation <https://hkraemer.github.io/PECUZAL_Matlab/>`_ and a 
+There is a `documentation <https://hkraemer.github.io/PECUZAL_Matlab/>`_ and a
 `Matlab Live-Script <https://github.com/hkraemer/PECUZAL_Matlab/blob/main/docs/pecuzal_examples.mlx>`_ available including some basic usage examples.
 
 
@@ -58,7 +64,7 @@ or as BiBTeX-entry:
 ::
 
     @misc{kraemer2020,
-    title={A unified and automated approach to attractor reconstruction}, 
+    title={A unified and automated approach to attractor reconstruction},
     author={K. H. Kraemer and G. Datseris and J. Kurths and I. Z. Kiss and J. L. Ocampo-Espindola and N. Marwan},
     year={2020},
     eprint={2011.07040},
@@ -70,4 +76,4 @@ or as BiBTeX-entry:
 
 Licence
 =======
-This is program is free software and runs under `MIT Licence <https://opensource.org/licenses/MIT>`_. 
+This is program is free software and runs under `MIT Licence <https://opensource.org/licenses/MIT>`_.
