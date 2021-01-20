@@ -26,14 +26,12 @@ Getting started
 
 There are two ways of using the proposed PECUZAL method:
 
-- Install as Toolbox. This is the easiest way and allows the usage of the the function `pecuzal_embedding.m` independently from your current working directory. It gets treated as a built-in Matlab-function and you do not have to copy any files etc. For this simply download the 'pecuzal-embedding.mltbx' from this repository or from Matlab-Central (hyperref HERE) and double-click for installation. That's it.
-- You can also download this repository and copy the functions `pecora_embedding.m`, `pecora_embedding_cycle.m`, `mutualinformation.m`, `uzal_cost.m` and all functions contained in the `/private`-folder into the working directory, in which you'd like to use the function `pecuzal_embedding.m`.
-
+- Install as Toolbox. This is the easiest way and allows the usage of the the function `pecuzal_embedding.m` independently from your current working directory. It gets treated as a built-in Matlab-function and you do not have to copy any files etc. For this simply download the 'pecuzal-embedding.mltbx' from this repository or from `Matlab-Central <https://de.mathworks.com/matlabcentral/fileexchange/86004-pecuzal-embedding-algorithm-for-matlab>`_ and double-click `pecuzal-embedding.mltbx` for installation. That's it.
+- You can also download this repository and copy the folder into the MATLAB user's directory. This is usually the user's "Documents" folder appended with "MATLAB" (you can find out using the function `userpath`). Add the toolbox by the `addpath` command, e.g., `addpath ~/Documents/MATLAB/PECUZAL_Matlab` on a Linux system. For everyday use, copy this command to a `startup.m` file in the MATLAB user's directory.
 
 TODO NOTES
 ==========
 - Proper citation, when accepted
-- Finish installation guide
 
 NOTE
 ====
