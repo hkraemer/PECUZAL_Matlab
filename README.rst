@@ -7,7 +7,7 @@
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4451879.svg
    :target: https://doi.org/10.5281/zenodo.4451879
 
-.. |View PECUZAL embedding algorithm for Matlab on File Exchange| image:: https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg
+.. image:: https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg
   :target: https://de.mathworks.com/matlabcentral/fileexchange/86004-pecuzal-embedding-algorithm-for-matlab
 
 
