@@ -48,7 +48,7 @@ Documentation and basic usage
 =============================
 
 There is a `documentation <https://hkraemer.github.io/PECUZAL_Matlab/>`_ and a
-`Matlab Live-Script <https://github.com/hkraemer/PECUZAL_Matlab/blob/main/docs/pecuzal_examples.mlx>`_ available including some basic usage examples.
+`Matlab Live-Script <https://github.com/hkraemer/PECUZAL_Matlab/blob/main/html/pecuzal_examples.mlx>`_ available including some basic usage examples.
 
 
 Citing and reference
