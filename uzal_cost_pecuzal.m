@@ -184,6 +184,9 @@ for j = 1:length(tws)
     L_trial = log10(sqrt(sigma2_avrg_trial)*sqrt(alpha2_trial));
     
     dist = L_trial - L;
+    if isnan(dist)
+        error("Computed 0-distances. You might use model-data, thus try to add minimal additive noise to the signal you wish to embed and try again.")
+    end
     if (dist > dist_former) && (dist_former<0)
         break
     else
