@@ -15,7 +15,7 @@ PECUZAL Matlab
 ==============
 
 We introduce the PECUZAL automatic embedding of time series method for Matlab. It is solely based
-on the paper [kraemer2020]_ `(Open Source) <https://arxiv.org/abs/2011.07040>`_, where the functionality is explained in detail. Here we
+on the paper [kraemer2021]_ `(Open Source) <http://iopscience.iop.org/article/10.1088/1367-2630/abe336>`_, where the functionality is explained in detail. Here we
 give an introduction to its easy usage in three examples. Enjoy Embedding!
 
 .. image:: icon.png
@@ -52,11 +52,12 @@ Citing and reference
 ====================
 If you enjoy this tool and find it valuable for your research please cite
 
-.. [kraemer2020] Kraemer et al., "A unified and automated approach to attractor reconstruction", New Journal of Physics. `doi:10.1088/1367-2630/abe336 <https://doi.org/10.1088/1367-2630/abe336>`_ (2021).
+.. [kraemer2021] Kraemer et al., "A unified and automated approach to attractor reconstruction", New Journal of Physics. `doi:10.1088/1367-2630/abe336 <https://doi.org/10.1088/1367-2630/abe336>`_ (2021).
 
 or as BiBTeX-entry:
 
 ::
+
 ﻿   @article{Kraemer2021,
 	author={Kai Hauke Kraemer and George Datseris and Jürgen Kurths and Istvan Z. Kiss and Jorge L. Ocampo-Espindola and Norbert Marwan},
 	title={A unified and automated approach to attractor reconstruction},
