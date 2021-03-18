@@ -1,5 +1,5 @@
 % PECUZAL Toolbox
-% Version 1.3.2   13-Mar-2021
+% Version 1.3.3   18-Mar-2021
 %
 %   mutualinformation - computes the automutualinformation values of timeseries.
 %   pecora_embedding_cycle - calculates the continuity statistics.
