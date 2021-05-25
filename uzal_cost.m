@@ -94,7 +94,7 @@ NNN = floor(sample_size*NN);
 data_samps = datasample(1:NN, NNN, 'Replace', false);
 
 use_vectorized = 0;
-if NNN > 2500 
+if NNN > 2500
    use_vectorized = 1;
 end
 
@@ -143,9 +143,9 @@ for ks = 1:NNN
         u_k=(sum(eps_ball,1)) / (k+1);
         % compute E_k2
         if strcmp(norm,'euc')
-            E_k2 = squeeze(sum(sqrt(sum((eps_ball - u_k).^2)).^2) / (k+1));
+            E_k2 = squeeze(sqrt(sum((eps_ball - u_k).^2)).^2 / (k+1));
         elseif strcmp(norm,'max')
-            E_k2 = squeeze(sum(max(abs(eps_ball - u_k)).^2) / (k+1));
+            E_k2 = squeeze(max(abs(eps_ball - u_k)).^2 / (k+1));
         end
 
     else
@@ -156,9 +156,9 @@ for ks = 1:NNN
             u_k = sum(eps_ball) / (k+1);  % Eq.14
             % compute E_k2
             if strcmp(norm,'euc')
-                E_k2(T) = sum(sqrt(sum((eps_ball-u_k).^2)).^2) / (k+1);  % Eq.13 
+                E_k2(T) = sqrt(sum((eps_ball-u_k).^2)).^2 / (k+1);  % Eq.13 
             elseif strcmp(norm,'max')
-                E_k2(T) = sum(max(abs(eps_ball-u_k)).^2) / (k+1);  % Eq.13 
+                E_k2(T) = max(abs(eps_ball-u_k)).^2 / (k+1);  % Eq.13 
             end 
         end
     end
