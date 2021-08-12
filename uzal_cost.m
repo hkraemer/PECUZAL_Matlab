@@ -143,9 +143,9 @@ for ks = 1:NNN
         u_k=(sum(eps_ball,1)) / (k+1);
         % compute E_k2
         if strcmp(norm,'euc')
-            E_k2 = squeeze(sqrt(sum((eps_ball - u_k).^2)).^2 / (k+1));
+            E_k2 = sum(squeeze(sum((eps_ball - u_k).^2) / (k+1))); 
         elseif strcmp(norm,'max')
-            E_k2 = squeeze(max(abs(eps_ball - u_k)).^2 / (k+1));
+            E_k2 = sum(squeeze(max(abs(eps_ball - u_k)).^2 / (k+1)));
         end
 
     else
@@ -156,9 +156,9 @@ for ks = 1:NNN
             u_k = sum(eps_ball) / (k+1);  % Eq.14
             % compute E_k2
             if strcmp(norm,'euc')
-                E_k2(T) = sqrt(sum((eps_ball-u_k).^2)).^2 / (k+1);  % Eq.13 
+                E_k2(T) = sum(rms(eps_ball-u_k).^2);  % Eq.13 
             elseif strcmp(norm,'max')
-                E_k2(T) = max(abs(eps_ball-u_k)).^2 / (k+1);  % Eq.13 
+                E_k2(T) = mean(max(abs(eps_ball-u_k),[],2).^2);  % Eq.13 
             end 
         end
     end
