@@ -7,7 +7,7 @@
     <param.summary>Matlab implementation of the PECUZAL automatic embedding method</param.summary>
     <param.description>Toolbox for the repository https://github.com/hkraemer/PECUZAL_Matlab. You can find all necessary information there or in the documentation https://hkraemer.github.io/PECUZAL_Matlab/</param.description>
     <param.screenshot>${PROJECT_ROOT}/icon.png</param.screenshot>
-    <param.version>1.3.4</param.version>
+    <param.version>1.3.6</param.version>
     <param.output>${PROJECT_ROOT}/pecuzal-embedding.mltbx</param.output>
     <param.products.name />
     <param.products.id />
@@ -71,6 +71,8 @@ README.rst
     <param.additional.sw.mac.url />
     <param.additional.sw.linux.url />
     <unset>
+      <param.authnamewatermark />
+      <param.email />
       <param.output />
       <param.products.name />
       <param.products.id />
@@ -147,7 +149,7 @@ README.rst
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.15.7</osver>
+      <osver>10.16</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>

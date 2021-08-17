@@ -163,15 +163,14 @@ for j = 1:length(tws)
         u_k = sum(eps_ball) / (k+1);  % Eq.14
         u_k_trial = sum(eps_ball_trial) / (k+1);  % Eq.14
         % compute E_k2
-        E2(fiducial_point,cnt) = sum(sqrt(sum((eps_ball-u_k).^2)).^2) / (k+1);  % Eq.13 
-        E2_trial(fiducial_point,cnt) = sum(sqrt(sum((eps_ball_trial-u_k_trial).^2)).^2) / (k+1);  % Eq.13 
-    
-        
+        E2(fiducial_point,cnt) = sum(rms(eps_ball-u_k).^2); % Eq.13 
+        E2_trial(fiducial_point,cnt) = sum(rms(eps_ball_trial-u_k_trial).^2); % Eq.13 
+
     end
     % compute distance of L-values and check whether that distance can be
     % increased
     
-    % Average E2 over all prediction horizons          
+    % Average E2 over all fiducial points         
     E2_avrg = mean(E2(1:NN,1:cnt),2);                   % Eq. 15
     E2_avrg_trial = mean(E2_trial(1:NN,1:cnt),2);
     sigma2 = E2_avrg ./ epsilon_k2(1:NN)'; % noise amplification σ², Eq. 17
