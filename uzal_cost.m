@@ -91,7 +91,11 @@ end
 % select a random phase space vector sample. 
 NN = length(Y)-Tw;
 NNN = floor(sample_size*NN);
-data_samps = datasample(1:NN, NNN, 'Replace', false);
+if sample_size == 1
+    data_samps = 1:NNN;
+else
+    data_samps = datasample(1:NN, NNN, 'Replace', false);
+end
 
 use_vectorized = 0;
 if NNN > 2500
@@ -134,7 +138,7 @@ for ks = 1:NNN
     
     % series of neighbours
     idx = [eps_idx' ones(k+1,1)]*[ones(1,Tw); 1:Tw]; 
-
+    
     if use_vectorized
         % neighborhood T timesteps ahead
         eps_ball = reshape(Y(idx,:),k+1, Tw,size(Y,2));
@@ -143,9 +147,9 @@ for ks = 1:NNN
         u_k=(sum(eps_ball,1)) / (k+1);
         % compute E_k2
         if strcmp(norm,'euc')
-            E_k2 = sum(squeeze(sum((eps_ball - u_k).^2) / (k+1))); 
+            E_k2 = squeeze(sum(sum((eps_ball - u_k).^2,2)) / (k+1)); % Eq.13 
         elseif strcmp(norm,'max')
-            E_k2 = sum(squeeze(max(abs(eps_ball - u_k)).^2 / (k+1)));
+            E_k2 = squeeze(mean(max(abs(eps_ball-u_k),[],2).^2));  % Eq.13              
         end
 
     else
@@ -158,7 +162,7 @@ for ks = 1:NNN
             if strcmp(norm,'euc')
                 E_k2(T) = sum(rms(eps_ball-u_k).^2);  % Eq.13 
             elseif strcmp(norm,'max')
-                E_k2(T) = mean(max(abs(eps_ball-u_k),[],2).^2);  % Eq.13 
+                E_k2(T) = mean(max(abs(eps_ball-u_k),[],2).^2); % Eq.13 
             end 
         end
     end

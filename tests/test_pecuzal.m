@@ -1,10 +1,9 @@
 %% Test PECUZAL functionality
 
 clear
-addpath('../.')
 
 % Test case for univariate example
-data = load('data/lorenz_pecora_uni_x.csv');
+data = load('./data/lorenz_pecora_uni_x.csv');
 data = data(1:500);
 theiler = 21;
 Tmax = 100;
