@@ -177,8 +177,8 @@ for j = 1:length(tws)
     sigma2_trial = E2_avrg_trial ./ epsilon_k2_trial(1:NN)'; 
     sigma2_avrg = mean(sigma2); % averaged value of the noise amplification, Eq. 18
     sigma2_avrg_trial = mean(sigma2_trial);
-    alpha2 = 1 / sum(epsilon_k2(1:NN).^(-1)); % for normalization, Eq. 21
-    alpha2_trial = 1 / sum(epsilon_k2_trial(1:NN).^(-1));
+    alpha2 = 1 / mean(epsilon_k2(1:NN).^(-1)); % for normalization, Eq. 21
+    alpha2_trial = 1 / mean(epsilon_k2_trial(1:NN).^(-1));
     L = log10(sqrt(sigma2_avrg)*sqrt(alpha2));
     L_trial = log10(sqrt(sigma2_avrg_trial)*sqrt(alpha2_trial));
     

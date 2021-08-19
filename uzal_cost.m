@@ -175,7 +175,7 @@ sigma_k2 = E_k2_avrg ./ epsilon_k2; % Eq. 17
 
 sigma_k2_avrg = mean(sigma_k2);   % Eq. 18
 
-alpha_k2 = 1/sum(1./epsilon_k2); % Eq. 21
+alpha_k2 = 1/mean(1./epsilon_k2); % Eq. 21
 
 % Output
 L = log10(sqrt(sigma_k2_avrg)*sqrt(alpha_k2));  % Eq. 26
