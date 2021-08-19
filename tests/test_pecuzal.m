@@ -40,20 +40,37 @@ assert(length(ts_vals) == 4)
 %% Test case for multivariate example
 data = load('data/lorenz_pecora_multi.csv');
 data1 = data(1:500,1:2);
-data2 = data(1:1000,1:2);
-data3 = data(1:2000,1:2);
+data2 = data(1:7000,1:2);
+data3 = data(1:8000,1:2);
+data4 = data(1:9000,1:2);
+data5 = data(1:10000,1:2);
 theiler = 15;
 Tmax = 100;
 taus = 0:Tmax;
 Tw = 10;
 
-L1 = uzal_cost(data1, theiler, 3, Tw, 1);
-L2 = uzal_cost(data2, theiler, 3, Tw, 1);
-L3 = uzal_cost(data3, theiler, 3, Tw, 1);
+L1 = uzal_cost(data2, theiler, 3, Tw, 1);
+L2 = uzal_cost(data3, theiler, 3, Tw, 1);
+L3 = uzal_cost(data4, theiler, 3, Tw, 1);
+L4 = uzal_cost(data5, theiler, 3, Tw, 1);
 
-delta_L1 = uzal_cost_pecuzal(data1(:,1), data1, Tw, 'theiler', theiler);
-delta_L2 = uzal_cost_pecuzal(data2(:,1), data2, Tw, 'theiler', theiler);
-delta_L3 = uzal_cost_pecuzal(data3(:,1), data3, Tw, 'theiler', theiler);
+delta_L1 = uzal_cost_pecuzal(data2(:,1), data2, Tw, 'theiler', theiler);
+delta_L2 = uzal_cost_pecuzal(data3(:,1), data3, Tw, 'theiler', theiler);
+delta_L3 = uzal_cost_pecuzal(data4(:,1), data4, Tw, 'theiler', theiler);
+delta_L4 = uzal_cost_pecuzal(data5(:,1), data5, Tw, 'theiler', theiler);
+
+%%
+
+figure()
+plot(7000:1000:10000,[L1,L2,L3,L4])
+title("L")
+grid on
+
+figure()
+plot(7000:1000:10000,[delta_L1,delta_L2,delta_L3,delta_L4])
+title("delta L")
+grid on
+
 
 %%
 [Y, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data1, taus, 'theiler', theiler);
