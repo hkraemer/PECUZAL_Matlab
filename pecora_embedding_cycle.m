@@ -170,7 +170,7 @@ for ts = 1:size(x, 2)
         
         % compute distances to all other points in dimension d.
         [distances, ~] = all_distances(Y_old(fiducial_point,:),...
-                                      Y_old(1:NNN,:), norm);
+                                      Y_old(1:end-delay_vals(end),:), norm);
         % sort these distances in ascending order
         [~,ind] = sort(distances);
         

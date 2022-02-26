@@ -25,6 +25,8 @@ function L_decrease = uzal_cost_pecuzal(Y, Y_trial, varargin)
 %      'econ'        - (default False) Economy-mode for L-statistic computation. Instead of
 %                      computing L-statistics for time horizons `2:Tw`, here we only compute them for
 %                      `2:2:Tw`.
+%      'samplesize'  - (default 1) Fraction of state space point to be 
+%                      considered for the computation.
 %
 %    Further reading:
 %    Uzal et al., Phys. Rev. E 84, 016223, 2011
@@ -39,7 +41,7 @@ function L_decrease = uzal_cost_pecuzal(Y, Y_trial, varargin)
 % This program is free software and runs under MIT licence.
 
 %% in- and output check
-narginchk(1,9)
+narginchk(1,11)
 nargoutchk(1,1)
 
 %% Assign input
@@ -49,12 +51,14 @@ Tw = 50;
 theiler = 1;
 k = 3;
 econ = false;
+samplesize = 1;
 
 % required and optional arguments
 p = inputParser;
 
 validScalarPosNum1 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && rem(x,1)==0;
 validScalarPosNum2 = @(x) isnumeric(x) && isscalar(x) && (x > 0);
+validScalarPosNum3 = @(x) isnumeric(x) && isscalar(x) && (x > 0) && (x <= 1);
 validDimension = @(x) isnumeric(x) && ismatrix(x);
 validType = @(x) islogical(x);
 
@@ -64,6 +68,7 @@ addOptional(p,'Tw',Tw,validScalarPosNum2);
 addParameter(p,'theiler',theiler,validScalarPosNum1);
 addParameter(p,'k',k,validScalarPosNum2);
 addParameter(p,'econ',econ,validType);
+addParameter(p,'samplesize',samplesize,validScalarPosNum3);
 
 % parse input arguments
 parse(p, Y, Y_trial, varargin{:})
@@ -75,6 +80,7 @@ Tw = p.Results.Tw;
 theiler = p.Results.theiler;
 k = p.Results.k;
 econ = p.Results.econ;
+samplesize = p.Results.samplesize;
 
 norm = 'euc';
 metric = 'euclidean';
@@ -112,20 +118,27 @@ neighborhood_trial = zeros(k+1,D2); % epsilon neighbourhood
 % initial L-decrease
 dist_former = 99999999;
 
+NN = length(Y_trial)-tws(end);
+if NN < 1
+    error("Time series too short for given possible delays and Theiler window to find enough nearest neighbours")
+end
+if samplesize==1
+    ns = 1:NN;
+    Nfp = length(ns);
+else
+    Nfp = floor(samplesize*NN); % number of considered fiducial points
+    ns = datasample(1:NN, Nfp, 'Replace', false);  % indices of fiducial points   
+end
+
 % loop over each time horizon
 cnt = 1;
 for j = 1:length(tws) 
     T = tws(j);
-    NN = length(Y_trial)-T;
-    if NN < 1
-        error("Time series too short for given possible delays and Theiler window to find enough nearest neighbours")
-    end
-    
-    for fiducial_point = 1:NN
-
+    for i = 1:Nfp
+        fiducial_point = ns(i);
         % find nearest neighbours for the fiducial point and
         % compute distances to all other points. 
-        distances = all_distances(Y(fiducial_point,:), Y(1:NN,:), norm);                                      
+        distances = all_distances(Y(fiducial_point,:), Y(1:end-T,:), norm);                                      
         % sort these distances in ascending order
         [~,ind] = sort(distances);
         % temporal neighbours within Theiler window
@@ -133,7 +146,7 @@ for j = 1:length(tws)
         % remove these neighbours from index list for distances
         ind(ismember(ind, idx)) = [];
         
-        distances_trial = all_distances(Y_trial(fiducial_point,:), Y_trial(1:NN,:), norm);                                      
+        distances_trial = all_distances(Y_trial(fiducial_point,:), Y_trial(1:end-T,:), norm);                                      
         % sort these distances in ascending order
         [~,ind_trial] = sort(distances_trial);
         % remove these neighbours from index list for distances
@@ -151,9 +164,9 @@ for j = 1:length(tws)
    
         %% estimate size of neighbourhood
         pd = pdist(neighborhood, metric);
-        epsilon_k2(fiducial_point) = (2/(k*(k+1))) * sum(pd.^2);  % Eq. 16
+        epsilon_k2(i) = (2/(k*(k+1))) * sum(pd.^2);  % Eq. 16
         pd_trial = pdist(neighborhood_trial, metric);
-        epsilon_k2_trial(fiducial_point) = (2/(k*(k+1))) * sum(pd_trial.^2);  % Eq. 16
+        epsilon_k2_trial(i) = (2/(k*(k+1))) * sum(pd_trial.^2);  % Eq. 16
     
         %% estimate E2
         % determine neighborhood T timesteps ahead
@@ -163,22 +176,22 @@ for j = 1:length(tws)
         u_k = sum(eps_ball) / (k+1);  % Eq.14
         u_k_trial = sum(eps_ball_trial) / (k+1);  % Eq.14
         % compute E_k2
-        E2(fiducial_point,cnt) = sum(rms(eps_ball-u_k).^2); % Eq.13 
-        E2_trial(fiducial_point,cnt) = sum(rms(eps_ball_trial-u_k_trial).^2); % Eq.13 
+        E2(i,cnt) = sum(rms(eps_ball-u_k).^2); % Eq.13 
+        E2_trial(i,cnt) = sum(rms(eps_ball_trial-u_k_trial).^2); % Eq.13 
 
     end
     % compute distance of L-values and check whether that distance can be
     % increased
     
     % Average E2 over all fiducial points         
-    E2_avrg = mean(E2(1:NN,1:cnt),2);                   % Eq. 15
-    E2_avrg_trial = mean(E2_trial(1:NN,1:cnt),2);
-    sigma2 = E2_avrg ./ epsilon_k2(1:NN)'; % noise amplification σ², Eq. 17
-    sigma2_trial = E2_avrg_trial ./ epsilon_k2_trial(1:NN)'; 
+    E2_avrg = mean(E2(1:Nfp,1:cnt),2);                   % Eq. 15
+    E2_avrg_trial = mean(E2_trial(1:Nfp,1:cnt),2);
+    sigma2 = E2_avrg ./ epsilon_k2(1:Nfp)'; % noise amplification σ², Eq. 17
+    sigma2_trial = E2_avrg_trial ./ epsilon_k2_trial(1:Nfp)'; 
     sigma2_avrg = mean(sigma2); % averaged value of the noise amplification, Eq. 18
     sigma2_avrg_trial = mean(sigma2_trial);
-    alpha2 = 1 / mean(epsilon_k2(1:NN).^(-1)); % for normalization, Eq. 21
-    alpha2_trial = 1 / mean(epsilon_k2_trial(1:NN).^(-1));
+    alpha2 = 1 / mean(epsilon_k2(1:Nfp).^(-1)); % for normalization, Eq. 21
+    alpha2_trial = 1 / mean(epsilon_k2_trial(1:Nfp).^(-1));
     L = log10(sqrt(sigma2_avrg)*sqrt(alpha2));
     L_trial = log10(sqrt(sigma2_avrg_trial)*sqrt(alpha2_trial));
     

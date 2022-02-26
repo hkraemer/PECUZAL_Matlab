@@ -213,7 +213,7 @@ while flag
                         Y_new = embed2(Y_old, x(:,ts), tau_use_(i));
                         Ls_(i) = uzal_cost_pecuzal(Y_old, Y_new, ...
                             delay_vals(end), 'theiler', theiler,...
-                            'k', k, 'econ', econ);
+                            'k', k, 'econ', econ, 'samplesize', sample_size);
                     end    
                     % pick the peak, which goes along with the least L/cost
                     [~, order] = sort(Ls_);
@@ -290,7 +290,7 @@ while flag
                     Y_new = embed2(Y_old, x(:,ts), tau_use_(i));
                     Ls_(i) = uzal_cost_pecuzal(Y_old, Y_new, ...
                         delay_vals(end), 'theiler', theiler,...
-                        'k', k, 'econ', econ);
+                        'k', k, 'econ', econ, 'samplesize', sample_size);
                 end
                 % pick the peak, which goes along with minimum L
                 [~, order] = sort(Ls_);
