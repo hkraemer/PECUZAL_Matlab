@@ -14,4 +14,4 @@ jobs:
       - name: Run tests
       - uses: matlab-actions/run-command@v1
         with:
-          command: addpath('tests'), test_pecuzal
+          command: addpath('tests'), results = test_pecuzal, asserSuccess(results);
