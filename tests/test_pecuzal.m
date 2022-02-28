@@ -3,7 +3,7 @@
 clear
 
 % Test case for univariate example
-data = load('./data/lorenz_pecora_uni_x.csv');
+data = load('/tests/data/lorenz_pecora_uni_x.csv');
 data = data(1:500);
 theiler = 21;
 Tmax = 100;
@@ -44,7 +44,7 @@ assert(length(ts_vals) == 4)
 
 
 % Test case for multivariate example
-data = load('data/lorenz_pecora_multi.csv');
+data = load('/tests/data/lorenz_pecora_multi.csv');
 data1 = data(1:500,1:2);
 data2 = data(1:7000,1:2);
 data3 = data(1:8000,1:2);
