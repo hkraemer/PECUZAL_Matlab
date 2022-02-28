@@ -1,5 +1,7 @@
 name: Run MATLAB Tests on GitHub-Hosted Runner
-on: [push]
+on:
+  push:
+    - '!Git_docs'
 jobs:
   PECUZAL-test-job:
     name: Run MATLAB Tests for PECUZAL
@@ -14,4 +16,4 @@ jobs:
       - name: Run tests
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('tests'), results = test_pecuzal, asserSuccess(results);
+          command: addpath('tests'), test_pecuzal
