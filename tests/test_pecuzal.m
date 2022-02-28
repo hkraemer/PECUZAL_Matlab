@@ -3,6 +3,7 @@
 clear
 
 % Test case for univariate example
+cd('./tests')
 display(pwd)
 data = load('/data/lorenz_pecora_uni_x.csv');
 data = data(1:500);
