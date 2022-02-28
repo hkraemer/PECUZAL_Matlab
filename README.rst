@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/hkraemer/PECUZAL_Matlab.svg?branch=main
     :target: https://travis-ci.org/hkraemer/PECUZAL_Matlab
 
+.. image:: https://github.com/hkraemer/PECUZAL_Matlab/actions/workflows/matlab-actions.yml/badge.svg
+    :target: https://github.com/hkraemer/PECUZAL_Matlab
+
 .. image:: https://img.shields.io/badge/docs-dev-blue.svg
     :target: https://hkraemer.github.io/PECUZAL_Matlab/
 
