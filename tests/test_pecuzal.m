@@ -3,9 +3,9 @@
 clear
 
 % Test case for univariate example
-cd('./tests/data')
+addpath('data')
+addpath('../.')
 data = load('lorenz_pecora_uni_x.csv');
-cd('../..')
 data = data(1:500);
 theiler = 21;
 Tmax = 100;
