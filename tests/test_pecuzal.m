@@ -3,8 +3,9 @@
 clear
 
 % Test case for univariate example
-addpath('data')
-addpath('../.')
+addpath('test/data')
+addpath('test')
+addpath('./')
 data = load('lorenz_pecora_uni_x.csv');
 data = data(1:500);
 theiler = 21;
