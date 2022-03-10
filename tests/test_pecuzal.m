@@ -37,11 +37,11 @@ assert(length(ts_vals) == 4)
 rng(1)
 [~, tau_vals, ts_vals, Ls, ~] = pecuzal_embedding(data, taus, 'theiler', theiler, 'econ', true, 'sample_size', 0.8);
 
-assert(-0.691 < sum(Ls))
-assert(sum(Ls) < -0.692)
+assert(-0.692 < sum(Ls))
+assert(sum(Ls) < -0.691)
 assert(tau_vals(2) == 20)
 assert(tau_vals(3) == 76)
-assert(tau_vals(3) == 10)
+assert(tau_vals(4) == 10)
 assert(length(ts_vals) == 4)
 
 
